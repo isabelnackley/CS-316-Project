@@ -11,9 +11,9 @@ app.config['TEMPLATES_AUTO_RELOAD'] = True
 app.config['SQLALCHEMY_DATABASE_URI'] = SQLALCHEMY_DATABASE_URI
 db = SQLAlchemy(app)
 
-class test1(db.Model):
-    __tablename__ = 'test1'
-    id = db.Column('a', db.Integer(), primary_key = True)
+class User(db.Model):
+    __tablename__ = 'Users'
+    id = db.Column('id', db.Integer(), primary_key = True)
 
 
 
@@ -24,4 +24,4 @@ def hello(name=None):
 
 if __name__ == '__main__':
     #app.run()
-    print(db.session.query(test1).all())
+    print(db.session.query(User).all())
