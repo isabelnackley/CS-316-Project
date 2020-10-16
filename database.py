@@ -11,9 +11,7 @@ app.config['TEMPLATES_AUTO_RELOAD'] = True
 app.config['SQLALCHEMY_DATABASE_URI'] = SQLALCHEMY_DATABASE_URI
 db = SQLAlchemy(app)
 
-class User(db.Model):
-    __tablename__ = 'Users'
-    id = db.Column('id', db.Integer(), primary_key = True)
+
 
 
 
