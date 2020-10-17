@@ -19,10 +19,7 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="0e71d32b-3a62-4698-a580-dd33cfff282b" name="Default Changelist" comment="added a requirements.txt file">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/database.py" beforeDir="false" afterPath="$PROJECT_DIR$/database.py" afterDir="false" />
-    </list>
+    <list default="true" id="0e71d32b-3a62-4698-a580-dd33cfff282b" name="Default Changelist" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -91,7 +88,7 @@
       <option name="presentableId" value="Default" />
       <updated>1601248770077</updated>
       <workItem from="1602508016066" duration="1278000" />
-      <workItem from="1602963269339" duration="12434000" />
+      <workItem from="1602963269339" duration="12646000" />
     </task>
     <task id="LOCAL-00001" summary="Added a few lines for running he database script">
       <created>1601904383870</created>
@@ -128,7 +125,14 @@
       <option name="project" value="LOCAL" />
       <updated>1602969386454</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="added functions for the profile page">
+      <created>1602978172317</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1602978172317</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -151,18 +155,19 @@
     <MESSAGE value="added skeleton functions for all of the website pages" />
     <MESSAGE value="created the skeleton for MS2" />
     <MESSAGE value="added a requirements.txt file" />
-    <option name="LAST_COMMIT_MESSAGE" value="added a requirements.txt file" />
+    <MESSAGE value="added functions for the profile page" />
+    <option name="LAST_COMMIT_MESSAGE" value="added functions for the profile page" />
   </component>
   <component name="WindowStateProjectService">
     <state x="96" y="0" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1601903839876">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
     <state x="96" y="0" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1280.680@0.0.1280.680" timestamp="1601903839876" />
-    <state x="249" y="0" key="CommitChangelistDialog2" timestamp="1602969641242">
+    <state x="249" y="0" key="CommitChangelistDialog2" timestamp="1602978171460">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
     <state x="249" y="0" key="CommitChangelistDialog2/0.0.1280.680/2560.0.1920.1040@0.0.1280.680" timestamp="1602508392050" />
-    <state x="249" y="0" key="CommitChangelistDialog2/0.0.1280.680@0.0.1280.680" timestamp="1602969641242" />
+    <state x="249" y="0" key="CommitChangelistDialog2/0.0.1280.680@0.0.1280.680" timestamp="1602978171460" />
     <state x="122" y="51" key="DiffContextDialog" timestamp="1602964513376">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
@@ -187,15 +192,15 @@
       <screen x="0" y="0" width="1280" height="680" />
     </state>
     <state width="1238" height="122" key="GridCell.Tab.0.right/0.0.1280.680@0.0.1280.680" timestamp="1601904180196" />
-    <state x="244" y="51" key="MergeDialog" timestamp="1602967168385">
+    <state x="244" y="51" key="MergeDialog" timestamp="1602978335608">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
-    <state x="244" y="51" key="MergeDialog/0.0.1280.680@0.0.1280.680" timestamp="1602967168385" />
-    <state x="510" y="208" width="593" height="262" key="MultipleFileMergeDialog" timestamp="1602967168412">
+    <state x="244" y="51" key="MergeDialog/0.0.1280.680@0.0.1280.680" timestamp="1602978335608" />
+    <state x="510" y="208" width="593" height="262" key="MultipleFileMergeDialog" timestamp="1602978335631">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
     <state x="510" y="208" width="593" height="262" key="MultipleFileMergeDialog/0.0.1280.680/2560.0.1920.1040@0.0.1280.680" timestamp="1602508429513" />
-    <state x="510" y="208" key="MultipleFileMergeDialog/0.0.1280.680@0.0.1280.680" timestamp="1602967168412" />
+    <state x="510" y="208" key="MultipleFileMergeDialog/0.0.1280.680@0.0.1280.680" timestamp="1602978335631" />
     <state x="233" y="0" key="SettingsEditor" timestamp="1602508335248">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
@@ -210,11 +215,11 @@
       <screen x="0" y="0" width="1536" height="824" />
     </state>
     <state x="467" y="239" key="com.intellij.ide.util.TipDialog/0.0.1536.824@0.0.1536.824" timestamp="1601248776296" />
-    <state x="349" y="129" key="git4idea.merge.GitPullDialog" timestamp="1602969689845">
+    <state x="349" y="129" key="git4idea.merge.GitPullDialog" timestamp="1602978179962">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
     <state x="349" y="129" key="git4idea.merge.GitPullDialog/0.0.1280.680/2560.0.1920.1040@0.0.1280.680" timestamp="1602508402402" />
-    <state x="349" y="129" key="git4idea.merge.GitPullDialog/0.0.1280.680@0.0.1280.680" timestamp="1602969689845" />
+    <state x="349" y="129" key="git4idea.merge.GitPullDialog/0.0.1280.680@0.0.1280.680" timestamp="1602978179962" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Final_Project$database.coverage" NAME="database Coverage Results" MODIFIED="1601904180139" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
