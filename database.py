@@ -4,17 +4,16 @@ from flask_sqlalchemy import SQLAlchemy
 import pymysql
 import relations
 
+
 SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://test:password@152.3.52.135/test1'
 
 app = Flask(__name__)
 app.config['TEMPLATES_AUTO_RELOAD'] = True
 app.config['SQLALCHEMY_DATABASE_URI'] = SQLALCHEMY_DATABASE_URI
 db = SQLAlchemy(app)
-User = (2, 1)  # dummy user who is placeholder until we make login
+User = {'id': 1, 'is_buyer': 0} #dummy user who is placeholder until we make login
 
 """Functions for the main page"""
-
-
 @app.route('/')
 def main():
     result = db.session.query(relations.Item.sku, relations.Item.title, relations.Item.category, relations.Item.price,
@@ -29,18 +28,24 @@ def main():
 def item_page(sku):
     result = db.session.query(relations.Item.sku, relations.Item.title, relations.Item.category, relations.Item.price,
                               relations.Item.rating, relations.Item.description).filter(relations.Item.sku == sku)
-    return jsonify(result)  # TODO: send this to GUI for display
+    return result #TODO: send this to GUI for display
 
+@app.route("/addItem", methods=["GET", "POST"])
+def addItem():
+    item_dict = request.get_json()
+    new_item = relations.Item(title = item_dict['title'], description = item_dict['description'], price = item_dict['price'],
+                              category = item_dict['category'], seller = User['id']) #TODO: get info from GUI and create exception if user tries to add same item multiple times, randomly generate sku
+    db.session.add(new_item)
+    db.session.commit()
+    return redirect(url_for('main'))
 
-@app.route("/addItem", methods=["POST"])
-def add_item():
-    return redirect(url_for('root'))
-
-
-@app.route("/removeItem")
-def remove_item():
-    print(msg)
-    return redirect(url_for('root'))
+@app.route("/removeItem", methods=["GET", "POST"])
+def removeItem():
+    sku = request.get_json()
+    item = db.session.query(relations.Item).filterby(sku = sku["sku"])
+    db.session.delete(item)
+    db.session.commit()
+    return redirect(url_for('main'))
 
 
 @app.route("/displayCategory")
@@ -62,7 +67,7 @@ def product_description():
 def search_results(search):
     result = db.session.query(relations.Item.sku, relations.Item.title, relations.Item.category, relations.Item.price,
                               relations.Item.rating, relations.Item.description).filter(relations.Item.title == search)
-    # return render_template('result.html', placetaker =placetaker) TODO: send this to GUI for display
+    #return render_template('result.html', placetaker =placetaker) TODO: send this to GUI for display
 
 
 """Functions for the cart"""
@@ -122,3 +127,4 @@ def change_password():
 if __name__ == '__main__':
     app.run()
     print(db.session.query(relations.User.id, relations.User.is_buyer).all())
+
