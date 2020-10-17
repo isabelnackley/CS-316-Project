@@ -1,5 +1,5 @@
 # database
-from flask import Flask, render_template, redirect, url_for
+from flask import Flask, render_template, redirect, url_for, request
 from flask_sqlalchemy import SQLAlchemy
 import pymysql
 import relations
@@ -11,10 +11,11 @@ app = Flask(__name__)
 app.config['TEMPLATES_AUTO_RELOAD'] = True
 app.config['SQLALCHEMY_DATABASE_URI'] = SQLALCHEMY_DATABASE_URI
 db = SQLAlchemy(app)
-User = (2,1) #dummy user who is placeholder until we make login
+User = {'id': 1, 'is_buyer': 0} #dummy user who is placeholder until we make login
 
 """Functions for the main page"""
 @app.route('/')
+@app.route('/main')
 def mainPage():
     result = db.session.query(relations.Item.sku, relations.Item.title, relations.Item.category, relations.Item.price, relations.Item.rating).all()
     return result #TODO: send this to GUI for display
@@ -28,13 +29,20 @@ def itemPage(sku):
 
 @app.route("/addItem", methods=["GET", "POST"])
 def addItem():
-    print(msg)
-    return redirect(url_for('root'))
+    item_dict = request.get_json()
+    new_item = relations.Item(title = item_dict['title'], description = item_dict['description'], price = item_dict['price'],
+                              category = item_dict['category'], seller = User['id']) #TODO: get info from GUI and create exception if user tries to add same item multiple times, randomly generate sku
+    db.session.add(new_item)
+    db.session.commit()
+    return redirect(url_for('main'))
 
-@app.route("/removeItem")
+@app.route("/removeItem", methods=["GET", "POST"])
 def removeItem():
-    print(msg)
-    return redirect(url_for('root'))
+    sku = request.get_json()
+    item = db.session.query(relations.Item).filterby(sku = sku["sku"])
+    db.session.delete(item)
+    db.session.commit()
+    return redirect(url_for('main'))
 
 @app.route("/displayCategory")
 def displayCategory():
