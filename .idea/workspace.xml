@@ -91,7 +91,7 @@
       <option name="presentableId" value="Default" />
       <updated>1601248770077</updated>
       <workItem from="1602508016066" duration="1278000" />
-      <workItem from="1602963269339" duration="3565000" />
+      <workItem from="1602963269339" duration="5123000" />
     </task>
     <task id="LOCAL-00001" summary="Added a few lines for running he database script">
       <created>1601904383870</created>
@@ -107,7 +107,14 @@
       <option name="project" value="LOCAL" />
       <updated>1602508393634</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="added skeleton functions for all of the website pages">
+      <created>1602966931549</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1602966931549</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -127,18 +134,19 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Added a few lines for running he database script" />
     <MESSAGE value="Added .idea to .gitignore" />
-    <option name="LAST_COMMIT_MESSAGE" value="Added .idea to .gitignore" />
+    <MESSAGE value="added skeleton functions for all of the website pages" />
+    <option name="LAST_COMMIT_MESSAGE" value="added skeleton functions for all of the website pages" />
   </component>
   <component name="WindowStateProjectService">
     <state x="96" y="0" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1601903839876">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
     <state x="96" y="0" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1280.680@0.0.1280.680" timestamp="1601903839876" />
-    <state x="249" y="0" key="CommitChangelistDialog2" timestamp="1602508392050">
+    <state x="249" y="0" key="CommitChangelistDialog2" timestamp="1602966929362">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
     <state x="249" y="0" key="CommitChangelistDialog2/0.0.1280.680/2560.0.1920.1040@0.0.1280.680" timestamp="1602508392050" />
-    <state x="249" y="0" key="CommitChangelistDialog2/0.0.1280.680@0.0.1280.680" timestamp="1601904382338" />
+    <state x="249" y="0" key="CommitChangelistDialog2/0.0.1280.680@0.0.1280.680" timestamp="1602966929362" />
     <state x="122" y="51" key="DiffContextDialog" timestamp="1602964513376">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
@@ -163,10 +171,15 @@
       <screen x="0" y="0" width="1280" height="680" />
     </state>
     <state width="1238" height="122" key="GridCell.Tab.0.right/0.0.1280.680@0.0.1280.680" timestamp="1601904180196" />
-    <state x="510" y="208" width="593" height="262" key="MultipleFileMergeDialog" timestamp="1602508429513">
+    <state x="244" y="51" key="MergeDialog" timestamp="1602967168385">
+      <screen x="0" y="0" width="1280" height="680" />
+    </state>
+    <state x="244" y="51" key="MergeDialog/0.0.1280.680@0.0.1280.680" timestamp="1602967168385" />
+    <state x="510" y="208" width="593" height="262" key="MultipleFileMergeDialog" timestamp="1602967168412">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
     <state x="510" y="208" width="593" height="262" key="MultipleFileMergeDialog/0.0.1280.680/2560.0.1920.1040@0.0.1280.680" timestamp="1602508429513" />
+    <state x="510" y="208" key="MultipleFileMergeDialog/0.0.1280.680@0.0.1280.680" timestamp="1602967168412" />
     <state x="233" y="0" key="SettingsEditor" timestamp="1602508335248">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
@@ -181,11 +194,11 @@
       <screen x="0" y="0" width="1536" height="824" />
     </state>
     <state x="467" y="239" key="com.intellij.ide.util.TipDialog/0.0.1536.824@0.0.1536.824" timestamp="1601248776296" />
-    <state x="349" y="129" key="git4idea.merge.GitPullDialog" timestamp="1602964550907">
+    <state x="349" y="129" key="git4idea.merge.GitPullDialog" timestamp="1602966952345">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
     <state x="349" y="129" key="git4idea.merge.GitPullDialog/0.0.1280.680/2560.0.1920.1040@0.0.1280.680" timestamp="1602508402402" />
-    <state x="349" y="129" key="git4idea.merge.GitPullDialog/0.0.1280.680@0.0.1280.680" timestamp="1602964550907" />
+    <state x="349" y="129" key="git4idea.merge.GitPullDialog/0.0.1280.680@0.0.1280.680" timestamp="1602966952345" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Final_Project$database.coverage" NAME="database Coverage Results" MODIFIED="1601904180139" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
