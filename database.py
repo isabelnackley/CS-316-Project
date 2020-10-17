@@ -2,6 +2,7 @@
 from flask import Flask, render_template, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 import pymysql
+import relations
 
 
 SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://test:password@152.3.52.135/test1'
@@ -12,8 +13,18 @@ app.config['SQLALCHEMY_DATABASE_URI'] = SQLALCHEMY_DATABASE_URI
 db = SQLAlchemy(app)
 
 
+@app.route('/main/')
+def mainPage():
+    result = db.session.query(relations.Item.sku, relations.Item.title, relations.Item.category, relations.Item.price, relations.Item.rating).all()
+    return result #TODO: send this to GUI for display
 
+@app.route('/item/<sku>')
+def itemPage(sku):
+    result = db.session.query(relations.Item.sku, relations.Item.title, relations.Item.category, relations.Item.price, relations.Item.rating, relations.Item.description).filter(relations.Item.sku == sku)
+    return result #TODO: send this to GUI for display
 
+@app.route('/item/<sku>/purchase')
+def
 
 @app.route('/hello/')
 @app.route('/hello/<name>')
@@ -22,4 +33,6 @@ def hello(name=None):
 
 if __name__ == '__main__':
     #app.run()
-    print(db.session.query(User).all())
+    print(db.session.query(relations.User.id, relations.User.email).all())
+    db.session.execute('')
+
