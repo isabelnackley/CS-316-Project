@@ -20,7 +20,6 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="0e71d32b-3a62-4698-a580-dd33cfff282b" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/database.py" beforeDir="false" afterPath="$PROJECT_DIR$/database.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -91,7 +90,7 @@
       <option name="presentableId" value="Default" />
       <updated>1601248770077</updated>
       <workItem from="1602508016066" duration="1278000" />
-      <workItem from="1602963269339" duration="17134000" />
+      <workItem from="1602963269339" duration="17184000" />
     </task>
     <task id="LOCAL-00001" summary="Added a few lines for running he database script">
       <created>1601904383870</created>
@@ -142,7 +141,14 @@
       <option name="project" value="LOCAL" />
       <updated>1602978366028</updated>
     </task>
-    <option name="localTasksCounter" value="8" />
+    <task id="LOCAL-00008" summary="finished the functions for the flask routes">
+      <created>1603043847109</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1603043847109</updated>
+    </task>
+    <option name="localTasksCounter" value="9" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -167,17 +173,19 @@
     <MESSAGE value="added a requirements.txt file" />
     <MESSAGE value="added functions for the profile page" />
     <MESSAGE value="merged branches" />
-    <option name="LAST_COMMIT_MESSAGE" value="merged branches" />
+    <MESSAGE value="finished the functions for the flask routes" />
+    <option name="LAST_COMMIT_MESSAGE" value="finished the functions for the flask routes" />
   </component>
   <component name="WindowStateProjectService">
     <state x="96" y="0" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1601903839876">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
     <state x="96" y="0" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1280.680@0.0.1280.680" timestamp="1601903839876" />
-    <state x="249" y="0" key="CommitChangelistDialog2" timestamp="1602978365195">
-      <screen x="0" y="0" width="1280" height="680" />
+    <state x="2934" y="0" key="CommitChangelistDialog2" timestamp="1603043845503">
+      <screen x="2560" y="0" width="1920" height="1040" />
     </state>
     <state x="249" y="0" key="CommitChangelistDialog2/0.0.1280.680/2560.0.1920.1040@0.0.1280.680" timestamp="1602508392050" />
+    <state x="2934" y="0" key="CommitChangelistDialog2/0.0.1280.680/2560.0.1920.1040@2560.0.1920.1040" timestamp="1603043845503" />
     <state x="249" y="0" key="CommitChangelistDialog2/0.0.1280.680@0.0.1280.680" timestamp="1602978365195" />
     <state x="122" y="51" key="DiffContextDialog" timestamp="1602964513376">
       <screen x="0" y="0" width="1280" height="680" />

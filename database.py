@@ -104,7 +104,7 @@ def profile_page(user_id):
     result = db.session.query(relations.User.id, relations.User.is_buyer, relations.User.password,
                               relations.User.email, relations.User.question, relations.User.answer,
                               relations.User.address).filter(relations.User.id == user_id)
-    return jsonify(result)  # TODO: send this to GUI for display
+    return jsonify(result)
 
 
 @app.route("/account/profile/edit", methods=["POST"])
