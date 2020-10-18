@@ -11,14 +11,17 @@ app = Flask(__name__)
 app.config['TEMPLATES_AUTO_RELOAD'] = True
 app.config['SQLALCHEMY_DATABASE_URI'] = SQLALCHEMY_DATABASE_URI
 db = SQLAlchemy(app)
-User = {'id': 1, 'is_buyer': 0} #dummy user who is placeholder until we make login
+User = {'id': 1, 'is_buyer': 0}    # dummy user who is placeholder until we make login
+
 
 """Functions for the main page"""
+
+
 @app.route('/')
 def main():
     result = db.session.query(relations.Item.sku, relations.Item.title, relations.Item.category, relations.Item.price,
                               relations.Item.rating).all()
-    return jsonify(result)  # TODO: send this to GUI for display
+    return jsonify(result)
 
 
 """Functions for the items"""
@@ -28,66 +31,68 @@ def main():
 def item_page(sku):
     result = db.session.query(relations.Item.sku, relations.Item.title, relations.Item.category, relations.Item.price,
                               relations.Item.rating, relations.Item.description).filter(relations.Item.sku == sku)
-    return result #TODO: send this to GUI for display
+    return jsonify(result)
+
 
 @app.route("/addItem", methods=["GET", "POST"])
-def addItem():
+def add_item():
     item_dict = request.get_json()
-    new_item = relations.Item(title = item_dict['title'], description = item_dict['description'], price = item_dict['price'],
-                              category = item_dict['category'], seller = User['id']) #TODO: get info from GUI and create exception if user tries to add same item multiple times, randomly generate sku
+    new_item = relations.Item(title=item_dict['title'], description=item_dict['description'], price = item_dict['price'],
+                              category=item_dict['category'], seller=User['id'])
     db.session.add(new_item)
     db.session.commit()
     return redirect(url_for('main'))
 
+
 @app.route("/removeItem", methods=["GET", "POST"])
-def removeItem():
+def remove_item():
     sku = request.get_json()
-    item = db.session.query(relations.Item).filterby(sku = sku["sku"])
+    item = db.session.query(relations.Item).filterby(sku=sku["sku"])
     db.session.delete(item)
     db.session.commit()
     return redirect(url_for('main'))
 
 
-@app.route("/displayCategory")
-def display_category():
-    placetaker = ''
-    return render_template('displayCategory.html', placetaker=placetaker)
-
-
-@app.route("/productDescription", methods=['GET', 'POST'])
-def product_description():
-    placetaker = ''
-    return render_template("productDescription.html", placetaker=placetaker)
+@app.route("/displayCategories")
+def display_categories():
+    categories = db.session.query(relations.Category.name)
+    return jsonify(categories)
 
 
 """Functions for search results"""
 
 
-@app.route('/results', methods=['GET', 'POST'])
+@app.route('/<search>/results', methods=['GET', 'POST'])
 def search_results(search):
     result = db.session.query(relations.Item.sku, relations.Item.title, relations.Item.category, relations.Item.price,
                               relations.Item.rating, relations.Item.description).filter(relations.Item.title == search)
-    #return render_template('result.html', placetaker =placetaker) TODO: send this to GUI for display
+    return jsonify(result)
 
 
 """Functions for the cart"""
 
 
-@app.route('/<id>/cart')
-def cart_page(sku):
-    result = db.session.query(relations.Item.sku, relations.Item.title, relations.Item.category, relations.Item.price,
-                              relations.Item.rating, relations.Item.description).filter(relations.Item.sku == sku)
-    return result  # TODO: send this to GUI for display
+@app.route('/<buyer_id>/cart')
+def cart_page(buyer_id):
+    result = db.session.query(relations.Cart.buyer_id, relations.Cart.sku).filter(relations.Cart.buyer_id == buyer_id)
+    return jsonify(result)
 
 
-@app.route("/addToCart")
+@app.route("/addToCart", methods=["POST"])
 def add_to_cart():
-    print('')
+    item_dict = request.get_json()
+    new_item = relations.Cart(buyer_id=item_dict["buyer_id"], sku=item_dict["sku"])
+    db.session.add(new_item)
+    db.session.commit()
     return redirect(url_for('root'))
 
 
-@app.route("/removeFromCart")
+@app.route("/removeFromCart", methods=["POST"])
 def remove_from_cart():
+    sku = request.get_json()
+    item = db.session.query(relations.Cart).filterby(buyer_id=sku["buyer_id"], sku=sku["sku"])
+    db.session.delete(item)
+    db.session.commit()
     return redirect(url_for('root'))
 
 
@@ -123,6 +128,7 @@ def change_password():
     user.password = in_dict["password"]
     db.session.commit()
     return "Password successfully updated."
+
 
 if __name__ == '__main__':
     app.run()
