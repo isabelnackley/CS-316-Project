@@ -5,12 +5,12 @@ from wtforms.validators import DataRequired
 
 class AddItemForm(FlaskForm):
     """Form to add a new item to the database"""
-    sku = IntegerField('sku', [DataRequired()])
-    title = TextField('title', [DataRequired()])
-    description = TextField('description', [DataRequired()])
-    category = StringField('category', [DataRequired()])
-    quantity = IntegerField('quantity', [DataRequired()])
-    price = DecimalField('price', [DataRequired()], places=2)
-    seller = IntegerField('seller', [DataRequired()])
-    image = StringField('image')
+    sku = IntegerField('SKU', [DataRequired()])
+    title = TextField('Title', [DataRequired()])
+    description = TextField('Description', [DataRequired()])
+    category = StringField('Category', [DataRequired()])
+    quantity = IntegerField('Quantity', [DataRequired()])
+    price = DecimalField('Price', [DataRequired()], places=2)
+    seller = IntegerField('Seller', [DataRequired()])
+    image = StringField('Image')
     submit = SubmitField('Submit')
