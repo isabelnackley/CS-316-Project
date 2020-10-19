@@ -19,8 +19,15 @@ User = {'id': 1, 'is_buyer': 0}    # dummy user who is placeholder until we make
 
 @app.route('/')
 def main():
-    result = db.session.query(relations.Item.sku, relations.Item.title, relations.Item.category, relations.Item.price,
-                              relations.Item.rating).all()
+    result = list()
+    query = db.session.query(relations.Item.sku, relations.Item.title, relations.Item.category, relations.Item.price,
+                             relations.Item.rating).all()
+
+    for row in query:
+        temp = {'sku': row.sku, 'title': row.title, 'category': row.category, 'price': row.price,
+                'rating': row.rating}
+        result.append(temp)
+
     return jsonify(result)
 
 
