@@ -60,9 +60,10 @@ class Item(db.Model):
     price = db.Column('price', db.Float())
     rating = db.Column('rating', db.Float())
     seller = db.Column('seller', db.Integer(), ForeignKey('Sellers.id'))
+    image = db.Column('image', db.String(256))
 
     def __init__(self, sku=None, title=None, description=None, category=None,
-                 quantity=None, price=None, rating=None, seller=None):
+                 quantity=None, price=None, rating=None, seller=None, image=None):
         self.sku = sku
         self.title = title
         self.description = description
@@ -71,6 +72,7 @@ class Item(db.Model):
         self.price = price
         self.rating = rating
         self.seller = seller
+        self.image = image
 
     def __repr__(self):
         return '<Item %r>' % self.model
@@ -167,11 +169,14 @@ class Order(db.Model):
     order_id = db.Column('order_id', db.Integer(), primary_key=True)
     total_price = db.Column('total_price', db.Float())
     time_stamp = db.Column('time_stamp', db.DateTime())
+    buyer_id = db.Column('buyer_id', db.Integer())
 
-    def __init__(self, order_id=None, total_price=None, time_stamp=None):
+    def __init__(self, order_id=None, total_price=None, time_stamp=None,
+                 buyer_id=None):
         self.order_id = order_id
         self.total_price = total_price
         self.time_stamp = time_stamp
+        self.buyer_id = buyer_id
 
     def __repr__(self):
         return '<Order %r>' % self.model
