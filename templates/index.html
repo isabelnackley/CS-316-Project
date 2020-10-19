@@ -1,16 +1,28 @@
 {% extends "header.html" %}
+
+{% block title %}Mini Amazon{% endblock %}
+
 {% block content %}
-<a href="{{ url_for('add_item') }}">
-<button> Add New Item</button>
-</a>
-<h3>Items</h3>
+    <div class="container">
+        <div class="jumbotron">
+            <h1 class="text-center">Items</h1>
+            <p class="text-center">Scroll through the following items to see what<br>
+               you like or click the Add Item button to upload<br>
+               an item to sell!</p>
+            <div class="row">
+                <div class="col text-center">
+                    <a href="{{ url_for('add_item') }}">
+                        <button> Add New Item</button>
+                    </a>
+                </div>
+            </div>
+        </div>
 {% for item in items %}
-    <div id="image"> {{item.image}}</div>
-    <script type="text/javascript"> document.getElementById('image_id').src= document.getElementById('image');</script>
-    <div><img id="image_id"/></div>
-    <div> <b>{{item.title}}</b></div>
+    <div class="text-center"> <b>{{item.title}}</b></div>
+    <img src="{{ item.image }}" class="img-rounded" width="400">
     <div> Price: {{item.price}}</div>
     <div> Seller: {{item.seller}}</div>
     <div> Rating: {{item.rating}}</div><br><br>
 {% endfor %}
+    </div>
 {% endblock %}
