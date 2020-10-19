@@ -1,8 +1,10 @@
 # database
 from flask import Flask, render_template, redirect, url_for, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
+import os
 import pymysql
 import relations
+from forms import AddItemForm
 
 
 SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://test:password@152.3.52.135/test1'
@@ -10,6 +12,7 @@ SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://test:password@152.3.52.135/test1'
 app = Flask(__name__)
 app.config['TEMPLATES_AUTO_RELOAD'] = True
 app.config['SQLALCHEMY_DATABASE_URI'] = SQLALCHEMY_DATABASE_URI
+app.config['SECRET_KEY'] = os.urandom(24)
 db = SQLAlchemy(app)
 User = {'id': 1, 'is_buyer': 0}    # dummy user who is placeholder until we make login
 
@@ -46,14 +49,18 @@ def item_page(sku):
     return jsonify(item)
 
 
-@app.route("/addItem", methods=["GET", "POST"])
+@app.route("/addItem", methods=['GET', 'POST'])
 def add_item():
-    item_dict = request.get_json()
-    new_item = relations.Item(title=item_dict['title'], description=item_dict['description'], price = item_dict['price'],
-                              category=item_dict['category'], seller=User['id'])
-    db.session.add(new_item)
-    db.session.commit()
-    return redirect(url_for('main'))
+    form = AddItemForm()
+    if request.method == 'POST':
+        print("Add Item Form Validated")
+        new_item = relations.Item(sku=form.sku.data, title=form.title.data, description=form.description.data,
+                                  price=form.price.data, category=form.category.data, quantity=form.quantity.data,
+                                  rating=0, seller=form.seller.data, image=form.image.data)
+        db.session.add(new_item)
+        db.session.commit()
+        return redirect(url_for('main'))
+    return render_template('additem.html', form=form)
 
 
 @app.route("/removeItem", methods=["GET", "POST"])
