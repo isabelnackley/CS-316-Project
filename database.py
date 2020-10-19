@@ -28,7 +28,7 @@ def main():
                 'rating': row.rating, 'seller': row.seller, 'image': row.image}
         result.append(temp)
 
-    return render_template('index.html', items = result)
+    return render_template('index.html', items=result)
 
 
 """Functions for the items"""
@@ -36,9 +36,14 @@ def main():
 
 @app.route('/item/<sku>', methods=["GET"])
 def item_page(sku):
-    result = db.session.query(relations.Item.sku, relations.Item.title, relations.Item.category, relations.Item.price,
-                              relations.Item.rating, relations.Item.description).filter(relations.Item.sku == sku)
-    return jsonify(result)
+    query = db.session.query(relations.Item.sku, relations.Item.title, relations.Item.category, relations.Item.price,
+                             relations.Item.rating, relations.Item.description, relations.Item.seller,
+                             relations.Item.image).filter(relations.Item.sku == sku)
+
+    item = {'sku': query.sku, 'title': query.title, 'category': query.category, 'price': query.price,
+            'rating': query.rating, 'description': query.description, 'seller': query.seller,
+            'image': query.image}
+    return jsonify(item)
 
 
 @app.route("/addItem", methods=["GET", "POST"])
@@ -62,8 +67,12 @@ def remove_item():
 
 @app.route("/displayCategories")
 def display_categories():
+    result = list()
     categories = db.session.query(relations.Category.name)
-    return jsonify(categories)
+    for row in categories:
+        temp = {'category': row.category}
+        result.append(temp)
+    return jsonify(result)
 
 
 """Functions for search results"""
@@ -71,8 +80,13 @@ def display_categories():
 
 @app.route('/<search>/results', methods=['GET', 'POST'])
 def search_results(search):
-    result = db.session.query(relations.Item.sku, relations.Item.title, relations.Item.category, relations.Item.price,
-                              relations.Item.rating, relations.Item.description).filter(relations.Item.title == search)
+    result = list()
+    query = db.session.query(relations.Item.sku, relations.Item.title, relations.Item.category, relations.Item.price,
+                             relations.Item.rating, relations.Item.description).filter(relations.Item.title == search)
+    for row in query:
+        temp = {'sku': row.sku, 'title': row.title, 'category': row.category, 'price': row.price,
+                'rating': row.rating, 'description': row.description}
+        result.append(temp)
     return jsonify(result)
 
 
@@ -108,9 +122,12 @@ def remove_from_cart():
 
 @app.route('/<user_id>/profile', methods=["GET"])
 def profile_page(user_id):
-    result = db.session.query(relations.User.id, relations.User.is_buyer, relations.User.password,
-                              relations.User.email, relations.User.question, relations.User.answer,
-                              relations.User.address).filter(relations.User.id == user_id)
+    query = db.session.query(relations.User.id, relations.User.is_buyer, relations.User.password,
+                             relations.User.email, relations.User.question, relations.User.answer,
+                             relations.User.address).filter(relations.User.id == user_id)
+    result = {'id': query.id, 'is_buyer': query.is_buyer, 'password': query.password,
+              'email': query.email, 'question': query.question, 'answer': query.answer,
+              'address': query.address}
     return jsonify(result)
 
 
