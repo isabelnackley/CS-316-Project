@@ -42,11 +42,11 @@ def item_page(sku):
     query = db.session.query(relations.Item.sku, relations.Item.title, relations.Item.category, relations.Item.price,
                              relations.Item.rating, relations.Item.description, relations.Item.seller,
                              relations.Item.image).filter(relations.Item.sku == sku)
-
+    query = query[0]
     item = {'sku': query.sku, 'title': query.title, 'category': query.category, 'price': query.price,
             'rating': query.rating, 'description': query.description, 'seller': query.seller,
             'image': query.image}
-    return jsonify(item)
+    return render_template('item.html', items=item)
 
 
 @app.route("/addItem", methods=['GET', 'POST'])
@@ -108,11 +108,11 @@ def cart_page(buyer_id):
 
 @app.route("/addToCart", methods=["POST"])
 def add_to_cart():
-    item_dict = request.get_json()
-    new_item = relations.Cart(buyer_id=item_dict["buyer_id"], sku=item_dict["sku"])
-    db.session.add(new_item)
-    db.session.commit()
-    return redirect(url_for('root'))
+    # item_dict = request.get_json()
+    # new_item = relations.Cart(buyer_id=item_dict["buyer_id"], sku=item_dict["sku"])
+    # db.session.add(new_item)
+    # db.session.commit()
+    return redirect(url_for('main'))
 
 
 @app.route("/removeFromCart", methods=["POST"])
