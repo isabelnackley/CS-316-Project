@@ -1,3 +1,9 @@
 {% for item in items %}
-    <div><a class="action" href="{{ url_for('item', id=item.id) }}">{{ item.name }}</a></div>
-    {% endfor %}
+    <div id="image"> {{item.image}}</div>
+    <script type="text/javascript"> document.getElementById('image_id').src= document.getElementById('image');</script>
+    <div><img id="image_id"/></div>
+    <div> {{item.title}}</div>
+    <div> Price: {{item.price}}</div>
+    <div> Seller: {{item.seller}}</div>
+    <div> Rating: {{item.rating}}</div>
+{% endfor %}

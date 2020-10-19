@@ -28,7 +28,7 @@ def main():
                 'rating': row.rating, 'seller': row.seller, 'image': row.image}
         result.append(temp)
 
-    return jsonify(result)
+    return render_template('index.html', items = result)
 
 
 """Functions for the items"""
@@ -139,5 +139,5 @@ def change_password():
 
 if __name__ == '__main__':
     app.run()
-    print(db.session.query(relations.User.id, relations.User.is_buyer).all())
+    #print(db.session.query(relations.User.id, relations.User.is_buyer).all())
 
