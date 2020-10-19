@@ -21,11 +21,11 @@ User = {'id': 1, 'is_buyer': 0}    # dummy user who is placeholder until we make
 def main():
     result = list()
     query = db.session.query(relations.Item.sku, relations.Item.title, relations.Item.category, relations.Item.price,
-                             relations.Item.rating).all()
+                             relations.Item.rating, relations.Item.seller, relations.Item.image).all()
 
     for row in query:
         temp = {'sku': row.sku, 'title': row.title, 'category': row.category, 'price': row.price,
-                'rating': row.rating}
+                'rating': row.rating, 'seller': row.seller, 'image': row.image}
         result.append(temp)
 
     return jsonify(result)

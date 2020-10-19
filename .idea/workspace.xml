@@ -22,6 +22,7 @@
     <list default="true" id="0e71d32b-3a62-4698-a580-dd33cfff282b" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/database.py" beforeDir="false" afterPath="$PROJECT_DIR$/database.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/relations.py" beforeDir="false" afterPath="$PROJECT_DIR$/relations.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -91,7 +92,7 @@
       <option name="presentableId" value="Default" />
       <updated>1601248770077</updated>
       <workItem from="1602508016066" duration="1278000" />
-      <workItem from="1602963269339" duration="19498000" />
+      <workItem from="1602963269339" duration="20716000" />
     </task>
     <task id="LOCAL-00001" summary="Added a few lines for running he database script">
       <created>1601904383870</created>
@@ -156,7 +157,14 @@
       <option name="project" value="LOCAL" />
       <updated>1603043884657</updated>
     </task>
-    <option name="localTasksCounter" value="10" />
+    <task id="LOCAL-00010" summary="updated main() to send a list of dictionaries for each item">
+      <created>1603067705221</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1603067705221</updated>
+    </task>
+    <option name="localTasksCounter" value="11" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -183,27 +191,29 @@
     <MESSAGE value="merged branches" />
     <MESSAGE value="finished the functions for the flask routes" />
     <MESSAGE value="removed todo items" />
-    <option name="LAST_COMMIT_MESSAGE" value="removed todo items" />
+    <MESSAGE value="updated main() to send a list of dictionaries for each item" />
+    <option name="LAST_COMMIT_MESSAGE" value="updated main() to send a list of dictionaries for each item" />
   </component>
   <component name="WindowStateProjectService">
     <state x="96" y="0" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1601903839876">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
     <state x="96" y="0" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1280.680@0.0.1280.680" timestamp="1601903839876" />
-    <state x="2934" y="0" key="CommitChangelistDialog2" timestamp="1603043883611">
+    <state x="2934" y="0" key="CommitChangelistDialog2" timestamp="1603067703766">
       <screen x="2560" y="0" width="1920" height="1040" />
     </state>
     <state x="249" y="0" key="CommitChangelistDialog2/0.0.1280.680/2560.0.1920.1040@0.0.1280.680" timestamp="1602508392050" />
-    <state x="2934" y="0" key="CommitChangelistDialog2/0.0.1280.680/2560.0.1920.1040@2560.0.1920.1040" timestamp="1603043883611" />
+    <state x="2934" y="0" key="CommitChangelistDialog2/0.0.1280.680/2560.0.1920.1040@2560.0.1920.1040" timestamp="1603067703766" />
     <state x="249" y="0" key="CommitChangelistDialog2/0.0.1280.680@0.0.1280.680" timestamp="1602978365195" />
     <state x="122" y="51" key="DiffContextDialog" timestamp="1602964513376">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
     <state x="122" y="51" key="DiffContextDialog/0.0.1280.680@0.0.1280.680" timestamp="1602964513376" />
-    <state x="421" y="95" key="FileChooserDialogImpl" timestamp="1602508088642">
-      <screen x="0" y="0" width="1280" height="680" />
+    <state x="3192" y="145" key="FileChooserDialogImpl" timestamp="1603068484913">
+      <screen x="2560" y="0" width="1920" height="1040" />
     </state>
     <state x="421" y="95" key="FileChooserDialogImpl/0.0.1280.680/2560.0.1920.1040@0.0.1280.680" timestamp="1602508088642" />
+    <state x="3192" y="145" key="FileChooserDialogImpl/0.0.1280.680/2560.0.1920.1040@2560.0.1920.1040" timestamp="1603068484913" />
     <state width="1238" height="122" key="GridCell.Tab.0.bottom" timestamp="1601904180196">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
@@ -235,10 +245,10 @@
     <state x="233" y="0" key="SettingsEditor/0.0.1280.680/2560.0.1920.1040@0.0.1280.680" timestamp="1602508335248" />
     <state x="233" y="0" key="SettingsEditor/0.0.1280.680@0.0.1280.680" timestamp="1601903820074" />
     <state x="279" y="57" key="SettingsEditor/0.0.1536.824@0.0.1536.824" timestamp="1601248850384" />
-    <state x="2910" y="112" key="Vcs.Push.Dialog.v2" timestamp="1603043891909">
+    <state x="2910" y="112" key="Vcs.Push.Dialog.v2" timestamp="1603067711172">
       <screen x="2560" y="0" width="1920" height="1040" />
     </state>
-    <state x="2910" y="112" key="Vcs.Push.Dialog.v2/0.0.1280.680/2560.0.1920.1040@2560.0.1920.1040" timestamp="1603043891909" />
+    <state x="2910" y="112" key="Vcs.Push.Dialog.v2/0.0.1280.680/2560.0.1920.1040@2560.0.1920.1040" timestamp="1603067711172" />
     <state x="233" y="73" key="Vcs.Push.Dialog.v2/0.0.1280.680@0.0.1280.680" timestamp="1602978372118" />
     <state x="467" y="239" key="com.intellij.ide.util.TipDialog" timestamp="1601248776296">
       <screen x="0" y="0" width="1536" height="824" />
