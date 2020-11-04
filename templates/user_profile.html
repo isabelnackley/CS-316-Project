@@ -1,0 +1,19 @@
+{% extends "header.html" %}
+{% block content %}
+    <div class="container">
+        <div class="jumbotron">
+            <h2 class="text-center">User Profile</h2>
+            <div> User ID: {{user.id}}</div>
+            <div> Email: {{user.email}}</div>
+            <div> Password: {{user.password}}</div>
+            <div> Shipping Address: {{user.address}}</div>
+            <div> Secret Question: {{user.question}}</div>
+            <div> Answer: {{user.answer}}</div>
+        </div>
+    </div>
+    <div class="col text-right">
+        <a href="{{ url_for('edit_profile', user_id= user.id) }}">
+            <button class="btn btn-secondary btn-lg"> Edit Profile</button>
+        </a>
+    </div>
+{% endblock %}

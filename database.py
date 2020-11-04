@@ -3,9 +3,10 @@ from flask import Flask, render_template, redirect, url_for, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
 import os
 import pymysql
-import relations
-from forms import AddItemForm
+from werkzeug.datastructures import MultiDict
 
+import relations
+from forms import AddItemForm, EditProfileForm
 
 SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://test:password@152.3.52.135/test1'
 
@@ -14,7 +15,7 @@ app.config['TEMPLATES_AUTO_RELOAD'] = True
 app.config['SQLALCHEMY_DATABASE_URI'] = SQLALCHEMY_DATABASE_URI
 app.config['SECRET_KEY'] = os.urandom(24)
 db = SQLAlchemy(app)
-User = {'id': 1, 'is_buyer': 0}    # dummy user who is placeholder until we make login
+User = {'id': 1, 'is_seller': 0}    # dummy user who is placeholder until we make login
 
 
 """Functions for the main page"""
@@ -31,7 +32,7 @@ def main():
                 'rating': row.rating, 'seller': row.seller, 'image': row.image}
         result.append(temp)
 
-    return render_template('index.html', items=result)
+    return render_template('index.html', items=result, user=1)
 
 
 """Functions for the items"""
@@ -129,27 +130,32 @@ def remove_from_cart():
 
 @app.route('/<user_id>/profile', methods=["GET"])
 def profile_page(user_id):
-    query = db.session.query(relations.User.id, relations.User.is_buyer, relations.User.password,
+    query = db.session.query(relations.User.id, relations.User.is_seller, relations.User.password,
                              relations.User.email, relations.User.question, relations.User.answer,
-                             relations.User.address).filter(relations.User.id == user_id)
-    result = {'id': query.id, 'is_buyer': query.is_buyer, 'password': query.password,
+                             relations.User.address).filter(relations.User.id == user_id).first()
+    user = {'id': query.id, 'is_seller': query.is_seller, 'password': query.password,
               'email': query.email, 'question': query.question, 'answer': query.answer,
               'address': query.address}
-    return jsonify(result)
+    return render_template('user_profile.html', user=user)
 
 
-@app.route("/account/profile/edit", methods=["POST"])
-def edit_profile():
-    in_dict = request.get_json()
-    user = User.query.filter_by(id=in_dict["id"]).first()
-    user.is_buyer = in_dict["is_buyer"]
-    user.password = in_dict["password"]
-    user.email = in_dict["email"]
-    user.question = in_dict["question"]
-    user.answer = in_dict["answer"]
-    user.address = in_dict["address"]
-    db.session.commit()
-    return "Profile successfully updated."
+@app.route("/<user_id>/profile/edit", methods=["POST", "GET"])
+def edit_profile(user_id):
+    query = db.session.query(relations.User.password,
+                             relations.User.email, relations.User.question, relations.User.answer,
+                             relations.User.address).filter(relations.User.id == user_id).first()
+    user = {'password': query.password,
+            'email': query.email, 'question': query.question, 'answer': query.answer,
+            'address': query.address}
+    if request.method == 'GET':
+        form = EditProfileForm(formdata=MultiDict({'email': query.email, 'password': query.password, 'address': query.address, 'question': query.question, 'answer': query.answer}))
+    elif request.method == 'POST':
+        form = EditProfileForm()
+        relations.User.updateUser(form.password.data, form.email.data, form.question.data, form.answer.data, form.address.data, user_id)
+        print("Edit Profile Form Validated")
+        #TODO: modify user and other relevant tables with new data input
+        db.session.commit()
+    return render_template('edit_profile.html', user=user, form=form)
 
 
 @app.route("/account/profile/changePassword", methods=["GET", "POST"])

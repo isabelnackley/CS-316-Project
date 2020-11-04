@@ -3,6 +3,11 @@
 {% block title %}Mini Amazon{% endblock %}
 
 {% block content %}
+    <h1 class="col text-right">
+        <a href="{{ url_for('profile_page', user_id= user) }}">
+            <button class="btn btn-secondary btn-lg"> View Profile</button>
+        </a>
+    </h1>
     <div class="container">
         <div class="jumbotron">
             <h1 class="text-center">Items</h1>
@@ -15,6 +20,7 @@
                         <button class="btn btn-secondary btn-lg"> Add New Item</button>
                     </a>
                 </div>
+
             </div>
         </div>
 {% for item in items %}

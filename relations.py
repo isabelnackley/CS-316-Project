@@ -7,12 +7,19 @@ from database import db
 class User(db.Model):
     __tablename__ = 'Users'
     id = db.Column('id', db.Integer(), primary_key=True)
-    is_buyer = db.Column('is_buyer', db.Integer())
+    is_seller = db.Column('is_seller', db.Integer())
     password = db.Column('password', db.String(256))
     email = db.Column('email', db.String(256))
     question = db.Column('question', db.String(256))
     answer = db.Column('answer', db.String(256))
     address = db.Column('address', db.String(256))
+    @staticmethod
+    def updateUser(password, email, question, answer, address, id):
+        db.session.execute('UPDATE Users SET password = :password, email = :email, question = :question, answer = '
+                           ':answer, address = :address WHERE id = :id',
+                           {'password': password, 'email': email, 'question': question, 'answer': answer, 'address': address, 'id': id})
+        print("User updated")
+        db.session.commit()
 
     def __init__(self, id=None, is_buyer=None, password=None,
                  email=None, question=None, answer=None, address=None):

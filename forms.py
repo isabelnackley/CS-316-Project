@@ -14,3 +14,14 @@ class AddItemForm(FlaskForm):
     seller = IntegerField('Seller', [DataRequired()])
     image = StringField('Image')
     submit = SubmitField('Submit')
+
+
+class EditProfileForm(FlaskForm):
+    """Form to edit user profile"""
+    email = TextField('Email', [DataRequired()])
+    password = TextField('Password', [DataRequired()])
+    address = TextField('Address', [DataRequired()])
+    question = TextField('Secret Question', [DataRequired()])
+    answer = TextField('Answer', [DataRequired()])
+    submit = SubmitField('Submit')
+
