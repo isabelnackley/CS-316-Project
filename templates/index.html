@@ -8,6 +8,11 @@
             <button class="btn btn-secondary btn-lg"> View Profile</button>
         </a>
     </h1>
+    <h1 class="col text-right">
+        <a href="{{ url_for('cart_page', buyer_id = user) }}">
+            <button class="btn btn-secondary btn-lg"> View Cart</button>
+        </a>
+    </h1>
     <div class="container">
         <div class="jumbotron">
             <h1 class="text-center">Items</h1>
@@ -26,8 +31,8 @@
 {% for item in items %}
     <div class="text-center"> <h3>{{item.title}}</h3></div><br>
     <img src="{{ item.image }}" class="img-rounded" width="400"><br>
-    <!--<div> Price: {{item.price}}</div>
-    <div> Seller: {{item.seller}}</div>
+    <div class="text-center"> Price: {{item.price}}</div>
+    <!--div> Seller: {{item.seller}}</div>
     <div> Rating: {{item.rating}}</div><br><br>-->
     <div class="row">
         <div class="col text-center">

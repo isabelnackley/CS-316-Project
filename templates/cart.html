@@ -1,1 +1,15 @@
 {% extends "header.html" %}
+{% block content %}
+    {% for item in items %}
+        <div class="text-center"> <h3>{{item.title}}</h3></div><br>
+        <img src="{{ item.image }}" class="img-rounded" width="400"><br>
+        <div> Price: {{item.price}}</div>
+        <div class="row">
+            <div class="col text-center">
+                <a href="{{ url_for('item_page', sku=item.sku) }}">
+                    <button class="btn btn-secondary btn-lg">View Item</button>
+                </a>
+            </div>
+        </div><br><br><br>
+    {% endfor %}
+{% endblock %}

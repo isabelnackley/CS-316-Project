@@ -222,7 +222,7 @@ class Places(db.Model):
 
 class Cart(db.Model):
     __tablename__ = 'Cart'
-    buyer_id = db.Column('buyer_id', db.Integer(), ForeignKey('Users.user_id'), primary_key=True)
+    buyer_id = db.Column('buyer_id', db.Integer(), ForeignKey('Users.id'), primary_key=True)
     sku = db.Column('SKU', db.Integer(), ForeignKey('Items.SKU'), primary_key=True)
 
     def __init__(self, buyer_id=None, sku=None):

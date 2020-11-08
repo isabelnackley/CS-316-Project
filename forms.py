@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, TextField, IntegerField, DecimalField, SubmitField
+from wtforms import StringField, TextField, IntegerField, DecimalField, SubmitField, HiddenField
 from wtforms.validators import DataRequired
 
 
@@ -24,4 +24,6 @@ class EditProfileForm(FlaskForm):
     question = TextField('Secret Question', [DataRequired()])
     answer = TextField('Answer', [DataRequired()])
     submit = SubmitField('Submit')
+
+
 
