@@ -10,9 +10,11 @@
             <div> Price: {{items.price}}</div>
             <div class="row">
                 <div class="col text-center">
-                    <a href="{{ url_for('add_to_cart', sku=items.sku) }}">
-                        <button class="btn btn-secondary btn-lg">Add To Cart</button>
-                    </a>
+                    <form action="/addToCart" method="post">
+                        <input type="hidden" name="buyer_id" value={{ user }}><br><br>
+                        <input type="hidden" name="sku" value={{ items.sku }}><br><br>
+                        <input type="submit" value="Add To Cart">
+                    </form>
                 </div>
             </div>
         </div>

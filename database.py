@@ -103,26 +103,38 @@ def search_results(search):
 
 @app.route('/<buyer_id>/cart')
 def cart_page(buyer_id):
-    result = db.session.query(relations.Cart.buyer_id, relations.Cart.sku).filter(relations.Cart.buyer_id == buyer_id)
-    return jsonify(result)
+    result = list()
+    query = db.session.query(relations.Cart.buyer_id, relations.Cart.sku).filter(relations.Cart.buyer_id == buyer_id)
+    for row in query:
+        item_query = db.session.query(relations.Item.sku, relations.Item.title, relations.Item.category,
+                                      relations.Item.price,
+                                      relations.Item.rating, relations.Item.description, relations.Item.seller,
+                                      relations.Item.image).filter(relations.Item.sku == row.sku)
+        item_query = item_query[0]
+        item = {'sku': item_query.sku, 'title': item_query.title, 'category': item_query.category,
+                'price': item_query.price, 'rating': item_query.rating, 'description': item_query.description,
+                'seller': item_query.seller, 'image': item_query.image}
+        result.append(item)
+    return render_template('cart.html', items=result, user=1)
 
 
-@app.route("/addToCart", methods=["POST"])
+@app.route("/addToCart", methods=["GET", "POST"])
 def add_to_cart():
-    # item_dict = request.get_json()
-    # new_item = relations.Cart(buyer_id=item_dict["buyer_id"], sku=item_dict["sku"])
-    # db.session.add(new_item)
-    # db.session.commit()
+    if request.method == 'POST':
+        sku = request.form['sku']
+        buyer_id = 1     # request.form['buyer_id']
+        new_item = relations.Cart(sku=sku, buyer_id=buyer_id)
+        db.session.add(new_item)
+        db.session.commit()
     return redirect(url_for('main'))
 
 
 @app.route("/removeFromCart", methods=["POST"])
 def remove_from_cart():
-    sku = request.get_json()
-    item = db.session.query(relations.Cart).filterby(buyer_id=sku["buyer_id"], sku=sku["sku"])
-    db.session.delete(item)
-    db.session.commit()
-    return redirect(url_for('root'))
+    buyer_id = 1  # request.form["buyer_id"]
+    sku = request.form["sku"]
+    relations.Cart.delete_from_cart(sku, buyer_id)
+    return redirect('/'+str(buyer_id)+'/cart') # Change the 1 to be a buyer_id variable
 
 
 """Functions for the user profile"""
