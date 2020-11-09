@@ -17,7 +17,8 @@ class User(db.Model):
     def updateUser(password, email, question, answer, address, id):
         db.session.execute('UPDATE Users SET password = :password, email = :email, question = :question, answer = '
                            ':answer, address = :address WHERE id = :id',
-                           {'password': password, 'email': email, 'question': question, 'answer': answer, 'address': address, 'id': id})
+                           {'password': password, 'email': email, 'question': question, 'answer': answer,
+                            'address': address, 'id': id})
         print("User updated")
         db.session.commit()
 
@@ -225,12 +226,21 @@ class Cart(db.Model):
     buyer_id = db.Column('buyer_id', db.Integer(), ForeignKey('Users.id'), primary_key=True)
     sku = db.Column('SKU', db.Integer(), ForeignKey('Items.SKU'), primary_key=True)
 
+    @staticmethod
+    def delete_from_cart(sku, buyer_id):
+        db.session.execute('DELETE FROM Cart WHERE sku = :sku AND buyer_id = :buyer_id',
+                           {'sku': sku, 'buyer_id': buyer_id})
+        print("Deleted from cart")
+        db.session.commit()
+
     def __init__(self, buyer_id=None, sku=None):
         self.buyer_id = buyer_id
         self.sku = sku
 
     def __repr__(self):
         return '<Cart %r>' % self.model
+
+
 
 
 class RequiresPayment(db.Model):

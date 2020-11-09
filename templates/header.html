@@ -23,6 +23,24 @@
 	<img src="https://www.marketplace.org/wp-content/uploads/2019/07/Amazondotcom.png" alt="Amazon logo" width=300 class="center">
   </head>
   <body>
+
+  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav">
+          <li class="nav-item active">
+            <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('profile_page', user_id= user) }}">Profile</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('cart_page', buyer_id = user) }}">Cart</a>
+          </li>
+        </ul>
+      </div>
+</nav>
+
     {% block content %}
     {% endblock %}
 

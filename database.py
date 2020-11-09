@@ -113,8 +113,7 @@ def cart_page(buyer_id):
         item_query = item_query[0]
         item = {'sku': item_query.sku, 'title': item_query.title, 'category': item_query.category,
                 'price': item_query.price, 'rating': item_query.rating, 'description': item_query.description,
-                'seller': item_query.seller, 'image': query.image}
-        print(item)
+                'seller': item_query.seller, 'image': item_query.image}
         result.append(item)
     return render_template('cart.html', items=result, user=1)
 
@@ -123,7 +122,7 @@ def cart_page(buyer_id):
 def add_to_cart():
     if request.method == 'POST':
         sku = request.form['sku']
-        buyer_id = request.form['buyer_id']
+        buyer_id = 1     # request.form['buyer_id']
         new_item = relations.Cart(sku=sku, buyer_id=buyer_id)
         db.session.add(new_item)
         db.session.commit()
@@ -132,11 +131,10 @@ def add_to_cart():
 
 @app.route("/removeFromCart", methods=["POST"])
 def remove_from_cart():
-    sku = request.get_json()
-    item = db.session.query(relations.Cart).filterby(buyer_id=sku["buyer_id"], sku=sku["sku"])
-    db.session.delete(item)
-    db.session.commit()
-    return redirect(url_for('root'))
+    buyer_id = 1  # request.form["buyer_id"]
+    sku = request.form["sku"]
+    relations.Cart.delete_from_cart(sku, buyer_id)
+    return redirect('/'+str(buyer_id)+'/cart') # Change the 1 to be a buyer_id variable
 
 
 """Functions for the user profile"""
