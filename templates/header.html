@@ -32,7 +32,7 @@
             <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="{{ url_for('profile_page', user_id= user) }}">Profile</a>
+            <a class="nav-link" href="{{ url_for('profile_page', user_id= user, is_seller = seller) }}">Profile</a>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="{{ url_for('cart_page', buyer_id = user) }}">Cart</a>

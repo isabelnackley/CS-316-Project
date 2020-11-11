@@ -1,0 +1,34 @@
+{% extends "header.html" %}
+{% block content %}
+
+    <div class="container">
+        <div class="jumbotron">
+            <h1 class="text-center">Items</h1>
+            <p class="text-center">Scroll through the following items to see what<br>
+               you like or click the Add Item button to upload<br>
+               an item to sell!</p>
+            <div class="row">
+                <div class="col text-center">
+                    <a href="{{ url_for('add_item') }}">
+                        <button class="btn btn-secondary btn-lg"> Add New Item</button>
+                    </a>
+                </div>
+
+            </div>
+        </div>
+{% for item in items %}
+    <div class="text-center"> <h5>{{item.title}}</h5></div><br>
+    <img src="{{ item.image }}" class="img-rounded" width="300"><br>
+    <div class="text-center"> Price: {{item.price}}</div>
+    <!--div> Seller: {{item.seller}}</div>
+    <div> Rating: {{item.rating}}</div><br><br>-->
+    <div class="row">
+        <div class="col text-center">
+            <a href="{{ url_for('modify_item', sku=item.sku) }}">
+                <button class="btn btn-secondary btn-lg">Modify Item</button>
+            </a>
+        </div>
+    </div><br><br><br>
+{% endfor %}
+    </div>
+{% endblock %}

@@ -32,7 +32,7 @@ def main():
                 'rating': row.rating, 'seller': row.seller, 'image': row.image}
         result.append(temp)
 
-    return render_template('index.html', items=result, user=1)
+    return render_template('index.html', items=result, user=1, seller=1)
 
 
 """Functions for the items"""
@@ -71,6 +71,12 @@ def remove_item():
     db.session.delete(item)
     db.session.commit()
     return redirect(url_for('main'))
+
+@app.route("/modifyItem", methods=["GET", "POST"])
+def modify_item(sku):
+    #TODO: finish edit item form, create edit_item page, create modify item button for each item on seller_page
+    return ""
+
 
 
 @app.route("/displayCategories")
@@ -140,15 +146,20 @@ def remove_from_cart():
 """Functions for the user profile"""
 
 
-@app.route('/<user_id>/profile', methods=["GET"])
-def profile_page(user_id):
+@app.route('/<user_id>/<is_seller>/profile', methods=["GET"])
+def profile_page(user_id, is_seller):
     query = db.session.query(relations.User.id, relations.User.is_seller, relations.User.password,
                              relations.User.email, relations.User.question, relations.User.answer,
                              relations.User.address).filter(relations.User.id == user_id).first()
     user = {'id': query.id, 'is_seller': query.is_seller, 'password': query.password,
               'email': query.email, 'question': query.question, 'answer': query.answer,
               'address': query.address}
-    return render_template('user_profile.html', user=user)
+    if is_seller == "0":
+        return render_template('user_profile.html', user=user)
+    if is_seller == "1":
+        # TODO: validate that user_id is a seller
+        print('seller confirmed')
+        return render_template('seller_profile.html', user=user)
 
 
 @app.route("/<user_id>/profile/edit", methods=["POST", "GET"])
@@ -165,10 +176,20 @@ def edit_profile(user_id):
         form = EditProfileForm()
         relations.User.updateUser(form.password.data, form.email.data, form.question.data, form.answer.data, form.address.data, user_id)
         print("Edit Profile Form Validated")
-        #TODO: modify user and other relevant tables with new data input
         db.session.commit()
     return render_template('edit_profile.html', user=user, form=form)
 
+@app.route("/<user_id>/sellerpage", methods=["POST", "GET"])
+def seller_page(user_id):
+    result = list()
+    query = db.session.query(relations.Item.sku, relations.Item.title, relations.Item.category, relations.Item.price,
+                             relations.Item.rating, relations.Item.seller, relations.Item.image).filter(relations.Item.seller==user_id)
+    for row in query:
+        temp = {'sku': row.sku, 'title': row.title, 'category': row.category, 'price': row.price,
+                'rating': row.rating, 'seller': row.seller, 'image': row.image}
+        result.append(temp)
+
+    return render_template('seller_page.html', items=result, user=1)
 
 @app.route("/account/profile/changePassword", methods=["GET", "POST"])
 def change_password():

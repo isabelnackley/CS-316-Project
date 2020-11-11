@@ -25,5 +25,9 @@ class EditProfileForm(FlaskForm):
     answer = TextField('Answer', [DataRequired()])
     submit = SubmitField('Submit')
 
+class EditItemForm(FlaskForm):
+    """Form to edit seller's item"""
+
+
 
 
