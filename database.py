@@ -133,8 +133,12 @@ def add_to_cart():
 def remove_from_cart():
     buyer_id = 1  # request.form["buyer_id"]
     sku = request.form["sku"]
-    relations.Cart.delete_from_cart(sku, buyer_id)
-    return redirect('/'+str(buyer_id)+'/cart') # Change the 1 to be a buyer_id variable
+    # relations.Cart.delete_from_cart(sku, buyer_id)
+    item = db.session.query(relations.Cart).filter(relations.Cart.sku == sku, relations.Cart.buyer_id == buyer_id)
+    db.session.delete(item)
+    db.session.commit()
+    return redirect('/'+str(buyer_id)+'/cart')   # Change the 1 to be a buyer_id variable
+
 
 
 """Functions for the user profile"""
