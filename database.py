@@ -130,7 +130,7 @@ def add_to_cart():
 
 
 @app.route("/removeFromCart", methods=["POST"])
-def remove_from_cart():
+def remove_from_cart():                                           # THIS DOES NOT YET WORK !!!!!!!
     buyer_id = 1  # request.form["buyer_id"]
     sku = request.form["sku"]
     # relations.Cart.delete_from_cart(sku, buyer_id)
@@ -138,6 +138,13 @@ def remove_from_cart():
     db.session.delete(item)
     db.session.commit()
     return redirect('/'+str(buyer_id)+'/cart')   # Change the 1 to be a buyer_id variable
+
+
+""" Functions for checkout """
+@app.route("/checkout", methods=["GET", "POST"])
+def checkout_cart():
+    return render_template('checkout.html')
+
 
 
 
