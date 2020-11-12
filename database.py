@@ -141,9 +141,26 @@ def remove_from_cart():                                           # THIS DOES NO
 
 
 """ Functions for checkout """
-@app.route("/checkout", methods=["GET", "POST"])
-def checkout():
-    return render_template('checkout.html')
+@app.route("/<user_id>/checkout", methods=["GET", "POST"])
+def checkout(user_id):
+    # Address query
+    address_query = db.session.query(relations.User.address).filter(relations.User.id == user_id).first()
+    address = {'address': address_query.address}
+    # Cart query
+    cart_result = list()
+    cart_query = db.session.query(relations.Cart.buyer_id,
+                                  relations.Cart.sku).filter(relations.Cart.buyer_id == user_id)
+    for row in cart_query:
+        item_query = db.session.query(relations.Item.sku, relations.Item.title, relations.Item.category,
+                                      relations.Item.price,
+                                      relations.Item.rating, relations.Item.description, relations.Item.seller,
+                                      relations.Item.image).filter(relations.Item.sku == row.sku)
+        item_query = item_query[0]
+        item = {'sku': item_query.sku, 'title': item_query.title, 'category': item_query.category,
+                'price': item_query.price, 'rating': item_query.rating, 'description': item_query.description,
+                'seller': item_query.seller, 'image': item_query.image}
+        cart_result.append(item)
+    return render_template('checkout.html', address=address, cart=cart_result)
 
 
 
