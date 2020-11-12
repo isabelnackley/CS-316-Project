@@ -142,7 +142,7 @@ def remove_from_cart():                                           # THIS DOES NO
 
 """ Functions for checkout """
 @app.route("/checkout", methods=["GET", "POST"])
-def checkout_cart():
+def checkout():
     return render_template('checkout.html')
 
 
