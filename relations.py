@@ -71,6 +71,14 @@ class Item(db.Model):
     seller = db.Column('seller', db.Integer(), ForeignKey('Sellers.id'))
     image = db.Column('image', db.String(256))
 
+    @staticmethod
+    def updateItem(title, description, category, quantity, price, image, sku):
+        db.session.execute('UPDATE Items SET title = :title, description = :description, category = :category, quantity = '
+                           ':quantity, price = :price, image = :image WHERE sku = :sku',
+                           {'title': title, 'description': description, 'category': category, 'quantity': quantity,
+                            'price': price, 'image': image, 'sku': sku})
+        print("Item updated")
+        db.session.commit()
     def __init__(self, sku=None, title=None, description=None, category=None,
                  quantity=None, price=None, rating=None, seller=None, image=None):
         self.sku = sku

@@ -4,11 +4,12 @@
         <div class="jumbotron">
             <h2 class="text-center">Edit Item</h2>
             <form action="" method="post" style="text-align:center" novalidate>
-                <div><h4>{{ form.email.label }}</h4><br>{{ form.email }}</div>
-                <div><h4>{{ form.password.label }}</h4><br>{{ form.password }}</div>
-                <div><h4>{{ form.question.label }}</h4><br>{{ form.question }}</div>
-                <div><h4>{{ form.answer.label }}</h4><br>{{ form.answer }}</div>
-                <div><h4>{{ form.address.label }}</h4><br>{{ form.address }}</div>
+                <div><h4>{{ form.title.label }}</h4><br>{{ form.title }}</div>
+                <div><h4>{{ form.description.label }}</h4><br>{{ form.description }}</div>
+                <div><h4>{{ form.category.label }}</h4><br>{{ form.category }}</div>
+                <div><h4>{{ form.quantity.label }}</h4><br>{{ form.quantity }}</div>
+                <div><h4>{{ form.price.label }}</h4><br>{{ form.price }}</div>
+                <div><h4>{{ form.image.label }}</h4><br>{{ form.image }}</div>
                 <div>{{ form.submit() }}</div>
             </form>
         </div>

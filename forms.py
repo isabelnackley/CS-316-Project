@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, TextField, IntegerField, DecimalField, SubmitField, HiddenField
+from wtforms import StringField, TextField, IntegerField, DecimalField, SubmitField, HiddenField, SelectField
 from wtforms.validators import DataRequired
 
 
@@ -27,7 +27,12 @@ class EditProfileForm(FlaskForm):
 
 class EditItemForm(FlaskForm):
     """Form to edit seller's item"""
-
-
+    title = TextField('Title', [DataRequired()])
+    description = TextField('Description', [DataRequired()])
+    category = SelectField('Category', [DataRequired()])
+    quantity = IntegerField('Quantity', [DataRequired()])
+    price = DecimalField('Price', [DataRequired()])
+    image = TextField('Image', [DataRequired()])
+    submit = SubmitField('Submit')
 
 

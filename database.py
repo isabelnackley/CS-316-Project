@@ -6,7 +6,7 @@ import pymysql
 from werkzeug.datastructures import MultiDict
 
 import relations
-from forms import AddItemForm, EditProfileForm
+from forms import AddItemForm, EditProfileForm, EditItemForm
 
 SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://test:password@152.3.52.135/test1'
 
@@ -72,10 +72,27 @@ def remove_item():
     db.session.commit()
     return redirect(url_for('main'))
 
-@app.route("/modifyItem", methods=["GET", "POST"])
+@app.route("/<sku>/modifyItem", methods=["GET", "POST"])
 def modify_item(sku):
-    #TODO: finish edit item form, create edit_item page, create modify item button for each item on seller_page
-    return ""
+    #TODO: validate that item sku is being sold by seller
+    query = db.session.query(relations.Item.title,
+                             relations.Item.description, relations.Item.category, relations.Item.quantity,
+                             relations.Item.price, relations.Item.image).filter(relations.Item.sku == sku).first()
+    item = {'title': query.title,
+            'description': query.description, 'category': query.category, 'quantity': query.quantity,
+            'price': query.price, 'image': query.image}
+    if request.method == 'GET':
+        form = EditItemForm(formdata=MultiDict(
+            {'title': query.title, 'description': query.description, 'category': query.category, 'quantity': query.quantity,
+             'price': query.price, 'image': query.image}))
+        form.category.choices = [x.name for x in db.session.query(relations.Category.name).all()]
+    elif request.method == 'POST':
+        form = EditItemForm()
+        relations.Item.updateItem(form.title.data, form.description.data, form.category.data, form.quantity.data,
+                                  form.price.data, form.image.data, sku)
+        print("Edit Item Form Validated")
+        db.session.commit()
+    return render_template('edit_item.html', item=item, form=form)
 
 
 
