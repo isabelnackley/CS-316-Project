@@ -104,6 +104,7 @@ def search_results(search):
 @app.route('/<buyer_id>/cart')
 def cart_page(buyer_id):
     result = list()
+    total_cost = 0
     query = db.session.query(relations.Cart.buyer_id, relations.Cart.sku).filter(relations.Cart.buyer_id == buyer_id)
     for row in query:
         item_query = db.session.query(relations.Item.sku, relations.Item.title, relations.Item.category,
@@ -114,8 +115,9 @@ def cart_page(buyer_id):
         item = {'sku': item_query.sku, 'title': item_query.title, 'category': item_query.category,
                 'price': item_query.price, 'rating': item_query.rating, 'description': item_query.description,
                 'seller': item_query.seller, 'image': item_query.image}
+        total_cost = total_cost + item_query.price
         result.append(item)
-    return render_template('cart.html', items=result, user=1)
+    return render_template('cart.html', items=result, user=1, cost=round(total_cost,2))
 
 
 @app.route("/addToCart", methods=["GET", "POST"])
@@ -148,6 +150,7 @@ def checkout(user_id):
     address = {'address': address_query.address}
     # Cart query
     cart_result = list()
+    total_cost = 0
     cart_query = db.session.query(relations.Cart.buyer_id,
                                   relations.Cart.sku).filter(relations.Cart.buyer_id == user_id)
     for row in cart_query:
@@ -159,8 +162,9 @@ def checkout(user_id):
         item = {'sku': item_query.sku, 'title': item_query.title, 'category': item_query.category,
                 'price': item_query.price, 'rating': item_query.rating, 'description': item_query.description,
                 'seller': item_query.seller, 'image': item_query.image}
+        total_cost = total_cost + item_query.price
         cart_result.append(item)
-    return render_template('checkout.html', address=address, cart=cart_result)
+    return render_template('checkout.html', address=address, cart=cart_result, totalcost=round(total_cost, 2))
 
 
 
