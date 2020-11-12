@@ -1,5 +1,5 @@
 # database
-from flask import Flask, render_template, redirect, url_for, jsonify, request
+from flask import Flask, render_template, redirect, url_for, jsonify, request, flash
 from flask_sqlalchemy import SQLAlchemy
 import os
 import pymysql
@@ -60,6 +60,7 @@ def add_item():
                                   rating=0, seller=form.seller.data, image=form.image.data)
         db.session.add(new_item)
         db.session.commit()
+        flash('Item added to inventory.')
         return redirect(url_for('main'))
     return render_template('additem.html', form=form)
 
@@ -128,6 +129,7 @@ def add_to_cart():
         new_item = relations.Cart(sku=sku, buyer_id=buyer_id)
         db.session.add(new_item)
         db.session.commit()
+        flash('Item added to cart.')
     return redirect(url_for('main'))
 
 
@@ -172,6 +174,7 @@ def place_order():
     # Add order to order table
     # remove items from item table
     # remove items from cart
+    flash('Purchase Successful.')
     return redirect(url_for('main'))
 
 
