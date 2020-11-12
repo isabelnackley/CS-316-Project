@@ -167,6 +167,14 @@ def checkout(user_id):
     return render_template('checkout.html', address=address, cart=cart_result, totalcost=round(total_cost, 2))
 
 
+@app.route('/placeorder', methods=["GET", "POST"])
+def place_order():
+    # Add order to order table
+    # remove items from item table
+    # remove items from cart
+    return redirect(url_for('main'))
+
+
 
 
 """Functions for the user profile"""
