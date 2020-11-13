@@ -7,7 +7,8 @@ import pymysql
 from werkzeug.datastructures import MultiDict
 
 import relations
-from forms import AddItemForm, EditProfileForm, EditItemForm, WriteReviewForm, LoginForm
+from forms import AddItemForm, EditProfileForm, EditItemForm, WriteReviewForm, LoginForm, ForgotPasswordForm, \
+    VerifyEmailForm
 
 SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://test:password@152.3.52.135/test1'
 
@@ -55,7 +56,7 @@ def login():
     if current_user.is_authenticated:
         return redirect(url_for('main'))
     form = LoginForm()
-    if request.method == 'POST':
+    if request.method == "POST":
         user = db.session.query(relations.User).filter_by(email=form.email.data).first()
         print(form.email.data)
         if user and user.password==form.password.data:
@@ -65,6 +66,33 @@ def login():
         # TODO: add flash of incorrect username/password
         return redirect(url_for('login'))
     return render_template('login.html', form=form)
+
+@app.route('/verifyemail', methods=["GET", "POST"])
+def verify_email():
+    if current_user.is_authenticated:
+        return redirect(url_for('main'))
+    form = VerifyEmailForm()
+    if request.method == 'POST':
+        user = db.session.query(relations.User).filter_by(email=form.email.data).first()
+        if user:
+            return redirect(url_for('forgot_password', user=user.id))
+    return render_template('verify_email.html', form=form)
+
+
+@app.route('/<user>/forgotpassword', methods=["POST", "GET"])
+def forgot_password(user):
+    if current_user.is_authenticated:
+        return redirect(url_for('main'))
+    user_object = db.session.query(relations.User).filter_by(id=user).first()
+    question = user_object.question
+    password= ""
+    form = ForgotPasswordForm()
+    if request.method == 'POST':
+        if user and user_object.answer==form.answer.data:
+            password= user_object.password
+            return render_template('forgot_password.html', form=form, password=password, question=question)
+    return render_template('forgot_password.html', form=form, password=password,  question=question)
+
 
 
 """Functions for the items"""

@@ -45,3 +45,10 @@ class LoginForm(FlaskForm):
     password = StringField('Password', [DataRequired()])
     submit = SubmitField('Log In')
 
+class ForgotPasswordForm(FlaskForm):
+    answer = StringField('Answer', [DataRequired()])
+    submit = SubmitField('Enter')
+
+class VerifyEmailForm(FlaskForm):
+    email = StringField('Email', [DataRequired()])
+    submit = SubmitField('Enter')
