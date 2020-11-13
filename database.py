@@ -199,8 +199,10 @@ def search_results(search):
 """Functions for the cart"""
 
 
-@app.route('/<buyer_id>/cart')
+@app.route('/cart')
+@login_required
 def cart_page(buyer_id):
+    buyer_id = current_user.id
     result = list()
     total_cost = 0
     query = db.session.query(relations.Cart.buyer_id, relations.Cart.sku).filter(relations.Cart.buyer_id == buyer_id)
@@ -215,14 +217,15 @@ def cart_page(buyer_id):
                 'seller': item_query.seller, 'image': item_query.image}
         total_cost = total_cost + item_query.price
         result.append(item)
-    return render_template('cart.html', items=result, user=1, cost=round(total_cost,2))
+    return render_template('cart.html', items=result, user=buyer_id, cost=round(total_cost, 2))
 
 
 @app.route("/addToCart", methods=["GET", "POST"])
+@login_required
 def add_to_cart():
     if request.method == 'POST':
         sku = request.form['sku']
-        buyer_id = 1  # request.form['buyer_id']
+        buyer_id = current_user.id  # request.form['buyer_id']
         new_item = relations.Cart(sku=sku, buyer_id=buyer_id)
         db.session.add(new_item)
         db.session.commit()
@@ -231,8 +234,9 @@ def add_to_cart():
 
 
 @app.route("/removeFromCart", methods=["POST"])
+@login_required
 def remove_from_cart():                                           # THIS DOES NOT YET WORK !!!!!!!
-    buyer_id = 1  # request.form["buyer_id"]
+    buyer_id = current_user.id  # request.form["buyer_id"]
     sku = request.form["sku"]
     # relations.Cart.delete_from_cart(sku, buyer_id)
     item = db.session.query(relations.Cart).filter(relations.Cart.sku == sku, relations.Cart.buyer_id == buyer_id)
@@ -242,8 +246,12 @@ def remove_from_cart():                                           # THIS DOES NO
 
 
 """ Functions for checkout """
-@app.route("/<user_id>/checkout", methods=["GET", "POST"])
-def checkout(user_id):
+
+
+@app.route("/checkout", methods=["GET", "POST"])
+@login_required
+def checkout():
+    user_id = current_user.id
     # Address query
     address_query = db.session.query(relations.User.address).filter(relations.User.id == user_id).first()
     address = {'address': address_query.address}
@@ -267,6 +275,7 @@ def checkout(user_id):
 
 
 @app.route('/placeorder', methods=["GET", "POST"])
+@login_required
 def place_order():
     # Add order to order table
     # remove items from item table
