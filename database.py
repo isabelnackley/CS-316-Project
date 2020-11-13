@@ -87,11 +87,11 @@ def review(sku, seller_id, buyer_id):
 def item_page(sku):
     query = db.session.query(relations.Item.sku, relations.Item.title, relations.Item.category, relations.Item.price,
                              relations.Item.rating, relations.Item.description, relations.Item.seller,
-                             relations.Item.image).filter(relations.Item.sku == sku)
+                             relations.Item.image, relations.Item.quantity).filter(relations.Item.sku == sku)
     query = query[0]
     item = {'sku': query.sku, 'title': query.title, 'category': query.category, 'price': query.price,
             'rating': query.rating, 'description': query.description, 'seller': query.seller,
-            'image': query.image}
+            'image': query.image, 'quantity': query.quantity}
     return render_template('item.html', items=item)
 
 
@@ -239,14 +239,15 @@ def get_cart_info():
     cart_query = db.session.query(relations.Cart.buyer_id,
                                   relations.Cart.sku).filter(relations.Cart.buyer_id == user_id)
     for row in cart_query:
-        item_query = db.session.query(relations.Item.sku, relations.Item.title, relations.Item.category,
-                                      relations.Item.price,
-                                      relations.Item.rating, relations.Item.description, relations.Item.seller,
-                                      relations.Item.image).filter(relations.Item.sku == row.sku)
+        item_query = db.session.query(relations.Item.sku, relations.Item.title,
+                                      relations.Item.category, relations.Item.price,
+                                      relations.Item.rating, relations.Item.description,
+                                      relations.Item.seller, relations.Item.image,
+                                      relations.Item.quantity).filter(relations.Item.sku == row.sku)
         item_query = item_query[0]
         item = {'sku': item_query.sku, 'title': item_query.title, 'category': item_query.category,
                 'price': item_query.price, 'rating': item_query.rating, 'description': item_query.description,
-                'seller': item_query.seller, 'image': item_query.image}
+                'seller': item_query.seller, 'image': item_query.image, 'quantity': item_query.quantity}
         total_cost = total_cost + item_query.price
         cart_result.append(item)
     return cart_result, total_cost
@@ -255,20 +256,35 @@ def get_cart_info():
 @app.route('/placeorder', methods=["GET", "POST"])
 @login_required
 def place_order():
+    invalid_items = list()
     buyer_id = current_user.id
-    # Add order to order table
     cart_result, total_cost = get_cart_info()
+    for item in cart_result:
+        if item['quantity'] > 0:
+            # remove items from cart
+            cart_query = db.session.query(relations.Cart).filter(relations.Cart.sku == item["sku"],
+                                                                 relations.Cart.buyer_id == buyer_id).first()
+            db.session.delete(cart_query)
+            db.session.commit()
+            item_query = db.session.query(relations.Item).filter(relations.Item.sku == item["sku"]).first()
+            item_query.quantity = item["quantity"] - 1
+            relations.Item.updateItem(item_query.title, item_query.description, item_query.category,
+                                      item_query.quantity, item_query.price, item_query.image, item_query.sku)
+            db.session.commit()
+            flash('Purchase Successful.')
+        else:
+            total_cost = total_cost - item["price"]
+            flash(f'ERROR: Could not purchase item {item["title"]}')
+            cart_result.remove(item)
+    # Add order to order table
+
     new_order = relations.Order(total_price=total_cost, buyer_id=buyer_id)
     db.session.add(new_order)
     db.session.commit()
     # remove items from item table
-    # remove items from cart
-    for item in cart_result:
-        item_query = db.session.query(relations.Cart).filter(relations.Cart.sku == item["sku"],
-                                                             relations.Cart.buyer_id == buyer_id).first()
-        db.session.delete(item_query)
-        db.session.commit()
-    flash('Purchase Successful.')
+
+
+
     return redirect(url_for('main'))
 
 
