@@ -263,6 +263,11 @@ def place_order():
     db.session.commit()
     # remove items from item table
     # remove items from cart
+    for item in cart_result:
+        item_query = db.session.query(relations.Cart).filter(relations.Cart.sku == item["sku"],
+                                                             relations.Cart.buyer_id == buyer_id).first()
+        db.session.delete(item_query)
+        db.session.commit()
     flash('Purchase Successful.')
     return redirect(url_for('main'))
 
