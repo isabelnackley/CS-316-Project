@@ -1,12 +1,13 @@
 # database
 from flask import Flask, render_template, redirect, url_for, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
+from flask_login import LoginManager, login_user, current_user, login_required
 import os
 import pymysql
 from werkzeug.datastructures import MultiDict
 
 import relations
-from forms import AddItemForm, EditProfileForm, EditItemForm
+from forms import AddItemForm, EditProfileForm, EditItemForm, WriteReviewForm, LoginForm
 
 SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://test:password@152.3.52.135/test1'
 
@@ -15,8 +16,10 @@ app.config['TEMPLATES_AUTO_RELOAD'] = True
 app.config['SQLALCHEMY_DATABASE_URI'] = SQLALCHEMY_DATABASE_URI
 app.config['SECRET_KEY'] = os.urandom(24)
 db = SQLAlchemy(app)
-User = {'id': 1, 'is_seller': 0}    # dummy user who is placeholder until we make login
+User = {'id': 1, 'is_seller': 0}  # dummy user who is placeholder until we make login
 
+login_manager = LoginManager()
+login_manager.init_app(app)
 
 """Functions for the main page"""
 
@@ -32,10 +35,52 @@ def main():
                 'rating': row.rating, 'seller': row.seller, 'image': row.image}
         result.append(temp)
 
-    return render_template('index.html', items=result, user=1, seller=1)
+    return render_template('index.html', items=result)
+
+
+@login_manager.user_loader
+def load_user(user_id):
+    if user_id is not None:
+        return db.session.query(relations.User).filter_by(id=user_id).first()
+
+
+@login_manager.unauthorized_handler
+def unauthorized():
+    return redirect(url_for('login'))
+    #TODO: add flash message "You must be logged in to view that page."
+
+
+@app.route('/login', methods=["POST", "GET"])
+def login():
+    if current_user.is_authenticated:
+        return redirect(url_for('main'))
+    form = LoginForm()
+    if request.method == 'POST':
+        user = db.session.query(relations.User).filter_by(email=form.email.data).first()
+        print(form.email.data)
+        if user and user.password==form.password.data:
+            print(form.password.data)
+            login_user(user)
+            return redirect(url_for('main'))
+        # TODO: add flash of incorrect username/password
+        return redirect(url_for('login'))
+    return render_template('login.html', form=form)
 
 
 """Functions for the items"""
+
+
+@app.route('/item/<sku>/<seller_id>/<buyer_id>/review', methods=["POST"])
+def review(sku, seller_id, buyer_id):
+    query = db.session.query(relations.Item.title).filter(relations.Item.sku == sku).first()
+    item = {'title': query.title}
+    form = WriteReviewForm()
+    new_review = relations.Review(seller_id=seller_id, buyer_id=buyer_id, sku=sku, item_rating=form.star_rating,
+                                  written_review=form.written_rating)
+    db.session.add(new_review)
+    db.session.commit()
+    # TODO: Validate that item being reviewed is sold by seller and has been bought by buyer
+    return render_template('review.html', item=item, form=form)
 
 
 @app.route('/item/<sku>', methods=["GET"])
@@ -72,9 +117,10 @@ def remove_item():
     db.session.commit()
     return redirect(url_for('main'))
 
+
 @app.route("/<sku>/modifyItem", methods=["GET", "POST"])
 def modify_item(sku):
-    #TODO: validate that item sku is being sold by seller
+    # TODO: validate that item sku is being sold by seller
     query = db.session.query(relations.Item.title,
                              relations.Item.description, relations.Item.category, relations.Item.quantity,
                              relations.Item.price, relations.Item.image).filter(relations.Item.sku == sku).first()
@@ -83,7 +129,8 @@ def modify_item(sku):
             'price': query.price, 'image': query.image}
     if request.method == 'GET':
         form = EditItemForm(formdata=MultiDict(
-            {'title': query.title, 'description': query.description, 'category': query.category, 'quantity': query.quantity,
+            {'title': query.title, 'description': query.description, 'category': query.category,
+             'quantity': query.quantity,
              'price': query.price, 'image': query.image}))
         form.category.choices = [x.name for x in db.session.query(relations.Category.name).all()]
     elif request.method == 'POST':
@@ -93,7 +140,6 @@ def modify_item(sku):
         print("Edit Item Form Validated")
         db.session.commit()
     return render_template('edit_item.html', item=item, form=form)
-
 
 
 @app.route("/displayCategories")
@@ -145,7 +191,7 @@ def cart_page(buyer_id):
 def add_to_cart():
     if request.method == 'POST':
         sku = request.form['sku']
-        buyer_id = 1     # request.form['buyer_id']
+        buyer_id = 1  # request.form['buyer_id']
         new_item = relations.Cart(sku=sku, buyer_id=buyer_id)
         db.session.add(new_item)
         db.session.commit()
@@ -157,23 +203,24 @@ def remove_from_cart():
     buyer_id = 1  # request.form["buyer_id"]
     sku = request.form["sku"]
     relations.Cart.delete_from_cart(sku, buyer_id)
-    return redirect('/'+str(buyer_id)+'/cart') # Change the 1 to be a buyer_id variable
+    return redirect('/' + str(buyer_id) + '/cart')  # Change the 1 to be a buyer_id variable
 
 
 """Functions for the user profile"""
 
 
-@app.route('/<user_id>/<is_seller>/profile', methods=["GET"])
-def profile_page(user_id, is_seller):
+@app.route('/profile', methods=["GET"])
+@login_required
+def profile_page():
     query = db.session.query(relations.User.id, relations.User.is_seller, relations.User.password,
                              relations.User.email, relations.User.question, relations.User.answer,
-                             relations.User.address).filter(relations.User.id == user_id).first()
+                             relations.User.address).filter(relations.User.id == current_user.id).first()
     user = {'id': query.id, 'is_seller': query.is_seller, 'password': query.password,
-              'email': query.email, 'question': query.question, 'answer': query.answer,
-              'address': query.address}
-    if is_seller == "0":
+            'email': query.email, 'question': query.question, 'answer': query.answer,
+            'address': query.address}
+    if current_user.is_seller == 0:
         return render_template('user_profile.html', user=user)
-    if is_seller == "1":
+    if current_user.is_seller == 1:
         # TODO: validate that user_id is a seller
         print('seller confirmed')
         return render_template('seller_profile.html', user=user)
@@ -188,25 +235,31 @@ def edit_profile(user_id):
             'email': query.email, 'question': query.question, 'answer': query.answer,
             'address': query.address}
     if request.method == 'GET':
-        form = EditProfileForm(formdata=MultiDict({'email': query.email, 'password': query.password, 'address': query.address, 'question': query.question, 'answer': query.answer}))
+        form = EditProfileForm(formdata=MultiDict(
+            {'email': query.email, 'password': query.password, 'address': query.address, 'question': query.question,
+             'answer': query.answer}))
     elif request.method == 'POST':
         form = EditProfileForm()
-        relations.User.updateUser(form.password.data, form.email.data, form.question.data, form.answer.data, form.address.data, user_id)
+        relations.User.updateUser(form.password.data, form.email.data, form.question.data, form.answer.data,
+                                  form.address.data, user_id)
         print("Edit Profile Form Validated")
         db.session.commit()
     return render_template('edit_profile.html', user=user, form=form)
+
 
 @app.route("/<user_id>/sellerpage", methods=["POST", "GET"])
 def seller_page(user_id):
     result = list()
     query = db.session.query(relations.Item.sku, relations.Item.title, relations.Item.category, relations.Item.price,
-                             relations.Item.rating, relations.Item.seller, relations.Item.image).filter(relations.Item.seller==user_id)
+                             relations.Item.rating, relations.Item.seller, relations.Item.image).filter(
+        relations.Item.seller == user_id)
     for row in query:
         temp = {'sku': row.sku, 'title': row.title, 'category': row.category, 'price': row.price,
                 'rating': row.rating, 'seller': row.seller, 'image': row.image}
         result.append(temp)
 
     return render_template('seller_page.html', items=result, user=1)
+
 
 @app.route("/account/profile/changePassword", methods=["GET", "POST"])
 def change_password():
@@ -219,5 +272,4 @@ def change_password():
 
 if __name__ == '__main__':
     app.run()
-    #print(db.session.query(relations.User.id, relations.User.is_buyer).all())
-
+    # print(db.session.query(relations.User.id, relations.User.is_buyer).all())

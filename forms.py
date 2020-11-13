@@ -35,4 +35,13 @@ class EditItemForm(FlaskForm):
     image = TextField('Image', [DataRequired()])
     submit = SubmitField('Submit')
 
+class WriteReviewForm(FlaskForm):
+    star_rating = IntegerField('Star Rating', [DataRequired()])
+    written_rating = TextField('Written Review')
+    submit = SubmitField('Submit')
+
+class LoginForm(FlaskForm):
+    email = StringField('Email', [DataRequired()])
+    password = StringField('Password', [DataRequired()])
+    submit = SubmitField('Log In')
 

@@ -1,0 +1,13 @@
+{% extends "header.html" %}
+{% block content %}
+    <div class="container">
+        <div class="jumbotron">
+            <h2 class="text-center">Login</h2>
+            <form action="" method="post" style="text-align:center" novalidate>
+                <div><h4>{{ form.email.label }}</h4><br>{{ form.email }}</div>
+                <div><h4>{{ form.password.label }}</h4><br>{{ form.password }}</div>
+                <div>{{ form.submit() }}</div>
+            </form>
+        </div>
+    </div>
+{% endblock %}

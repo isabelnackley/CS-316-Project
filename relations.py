@@ -1,10 +1,10 @@
 # relations
 from sqlalchemy import ForeignKey
-
+from flask_login import UserMixin
 from database import db
 
 
-class User(db.Model):
+class User(UserMixin, db.Model):
     __tablename__ = 'Users'
     id = db.Column('id', db.Integer(), primary_key=True)
     is_seller = db.Column('is_seller', db.Integer())
