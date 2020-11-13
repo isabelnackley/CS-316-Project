@@ -1,5 +1,5 @@
 # database
-from flask import Flask, render_template, redirect, url_for, jsonify, request
+from flask import Flask, render_template, redirect, url_for, jsonify, request, flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, login_user, current_user, login_required
 import os
@@ -105,6 +105,7 @@ def add_item():
                                   rating=0, seller=form.seller.data, image=form.image.data)
         db.session.add(new_item)
         db.session.commit()
+        flash('Item added to inventory.')
         return redirect(url_for('main'))
     return render_template('additem.html', form=form)
 
@@ -173,6 +174,7 @@ def search_results(search):
 @app.route('/<buyer_id>/cart')
 def cart_page(buyer_id):
     result = list()
+    total_cost = 0
     query = db.session.query(relations.Cart.buyer_id, relations.Cart.sku).filter(relations.Cart.buyer_id == buyer_id)
     for row in query:
         item_query = db.session.query(relations.Item.sku, relations.Item.title, relations.Item.category,
@@ -183,8 +185,9 @@ def cart_page(buyer_id):
         item = {'sku': item_query.sku, 'title': item_query.title, 'category': item_query.category,
                 'price': item_query.price, 'rating': item_query.rating, 'description': item_query.description,
                 'seller': item_query.seller, 'image': item_query.image}
+        total_cost = total_cost + item_query.price
         result.append(item)
-    return render_template('cart.html', items=result, user=1)
+    return render_template('cart.html', items=result, user=1, cost=round(total_cost,2))
 
 
 @app.route("/addToCart", methods=["GET", "POST"])
@@ -195,15 +198,55 @@ def add_to_cart():
         new_item = relations.Cart(sku=sku, buyer_id=buyer_id)
         db.session.add(new_item)
         db.session.commit()
+        flash('Item added to cart.')
     return redirect(url_for('main'))
 
 
 @app.route("/removeFromCart", methods=["POST"])
-def remove_from_cart():
+def remove_from_cart():                                           # THIS DOES NOT YET WORK !!!!!!!
     buyer_id = 1  # request.form["buyer_id"]
     sku = request.form["sku"]
-    relations.Cart.delete_from_cart(sku, buyer_id)
-    return redirect('/' + str(buyer_id) + '/cart')  # Change the 1 to be a buyer_id variable
+    # relations.Cart.delete_from_cart(sku, buyer_id)
+    item = db.session.query(relations.Cart).filter(relations.Cart.sku == sku, relations.Cart.buyer_id == buyer_id)
+    db.session.delete(item)
+    db.session.commit()
+    return redirect('/'+str(buyer_id)+'/cart')   # Change the 1 to be a buyer_id variable
+
+
+""" Functions for checkout """
+@app.route("/<user_id>/checkout", methods=["GET", "POST"])
+def checkout(user_id):
+    # Address query
+    address_query = db.session.query(relations.User.address).filter(relations.User.id == user_id).first()
+    address = {'address': address_query.address}
+    # Cart query
+    cart_result = list()
+    total_cost = 0
+    cart_query = db.session.query(relations.Cart.buyer_id,
+                                  relations.Cart.sku).filter(relations.Cart.buyer_id == user_id)
+    for row in cart_query:
+        item_query = db.session.query(relations.Item.sku, relations.Item.title, relations.Item.category,
+                                      relations.Item.price,
+                                      relations.Item.rating, relations.Item.description, relations.Item.seller,
+                                      relations.Item.image).filter(relations.Item.sku == row.sku)
+        item_query = item_query[0]
+        item = {'sku': item_query.sku, 'title': item_query.title, 'category': item_query.category,
+                'price': item_query.price, 'rating': item_query.rating, 'description': item_query.description,
+                'seller': item_query.seller, 'image': item_query.image}
+        total_cost = total_cost + item_query.price
+        cart_result.append(item)
+    return render_template('checkout.html', address=address, cart=cart_result, totalcost=round(total_cost, 2))
+
+
+@app.route('/placeorder', methods=["GET", "POST"])
+def place_order():
+    # Add order to order table
+    # remove items from item table
+    # remove items from cart
+    flash('Purchase Successful.')
+    return redirect(url_for('main'))
+
+
 
 
 """Functions for the user profile"""

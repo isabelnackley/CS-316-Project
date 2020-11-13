@@ -1,5 +1,7 @@
 {% extends "header.html" %}
+{% block title %}Cart{% endblock %}
 {% block content %}
+    <div class="container">
     <div class="jumbotron">
     <h1 class="text-center">Cart</h1>
     {% for item in items %}
@@ -27,7 +29,18 @@
                         </form>
                     </div>
                 </div>
+        <hr/>
         </div>
+
     {% endfor %}
+    <br><br>
+    <h4 class="text-center">Total Cost: ${{ cost }}</h4>
+    <br><br>
+    <div class="col text-center">
+        <a href="{{ url_for('checkout', user_id=user) }}">
+            <button class="btn btn-secondary btn-lg">Proceed to Checkout</button>
+        </a>
+    </div>
+    </div>
     </div>
 {% endblock %}
