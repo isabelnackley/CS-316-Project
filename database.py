@@ -172,6 +172,7 @@ def search_results(search):
 
 
 @app.route('/cart')
+@login_required
 def cart_page(buyer_id):
     buyer_id = current_user.id
     result = list()
@@ -192,6 +193,7 @@ def cart_page(buyer_id):
 
 
 @app.route("/addToCart", methods=["GET", "POST"])
+@login_required
 def add_to_cart():
     if request.method == 'POST':
         sku = request.form['sku']
@@ -204,6 +206,7 @@ def add_to_cart():
 
 
 @app.route("/removeFromCart", methods=["POST"])
+@login_required
 def remove_from_cart():                                           # THIS DOES NOT YET WORK !!!!!!!
     buyer_id = current_user.id  # request.form["buyer_id"]
     sku = request.form["sku"]
