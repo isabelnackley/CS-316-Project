@@ -173,7 +173,7 @@ def search_results(search):
 
 @app.route('/cart')
 @login_required
-def cart_page(buyer_id):
+def cart_page():
     buyer_id = current_user.id
     result = list()
     total_cost = 0
@@ -228,6 +228,12 @@ def checkout():
     address_query = db.session.query(relations.User.address).filter(relations.User.id == user_id).first()
     address = {'address': address_query.address}
     # Cart query
+    cart_result, total_cost = get_cart_info()
+    return render_template('checkout.html', address=address, cart=cart_result, totalcost=round(total_cost, 2))
+
+
+def get_cart_info():
+    user_id = current_user.id
     cart_result = list()
     total_cost = 0
     cart_query = db.session.query(relations.Cart.buyer_id,
@@ -243,13 +249,18 @@ def checkout():
                 'seller': item_query.seller, 'image': item_query.image}
         total_cost = total_cost + item_query.price
         cart_result.append(item)
-    return render_template('checkout.html', address=address, cart=cart_result, totalcost=round(total_cost, 2))
+    return cart_result, total_cost
 
 
 @app.route('/placeorder', methods=["GET", "POST"])
 @login_required
 def place_order():
+    buyer_id = current_user.id
     # Add order to order table
+    cart_result, total_cost = get_cart_info()
+    new_order = relations.Order(total_price=total_cost, buyer_id=buyer_id)
+    db.session.add(new_order)
+    db.session.commit()
     # remove items from item table
     # remove items from cart
     flash('Purchase Successful.')
