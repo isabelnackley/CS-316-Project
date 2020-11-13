@@ -188,6 +188,12 @@ class Order(db.Model):
     time_stamp = db.Column('time_stamp', db.DateTime())
     buyer_id = db.Column('buyer_id', db.Integer())
 
+    @staticmethod
+    def last_order():
+        last = db.session.execute("SELECT LAST_INSERT_ID() FROM Orders")
+        print(last)
+        return last
+
     def __init__(self, order_id=None, total_price=None, time_stamp=None,
                  buyer_id=None):
         self.order_id = order_id

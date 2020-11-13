@@ -281,13 +281,14 @@ def place_order():
     new_order = relations.Order(total_price=total_cost, buyer_id=buyer_id)
     db.session.add(new_order)
     db.session.commit()
+    print(new_order.order_id)
+    for item in cart_result:
+        new_oc = relations.OrdersContain(order_id=new_order.order_id, sku=item["sku"],
+                                         quantity_ordered=item["quantity"], price_at_order=item["price"])
+        db.session.add(new_oc)
+        db.session.commit()
     # remove items from item table
-
-
-
     return redirect(url_for('main'))
-
-
 
 
 """Functions for the user profile"""
