@@ -205,16 +205,16 @@ def add_to_cart():
     return redirect(url_for('main'))
 
 
-@app.route("/removeFromCart", methods=["POST"])
+@app.route("/removeFromCart/<sku>", methods=["GET", "POST"])
 @login_required
-def remove_from_cart():                                           # THIS DOES NOT YET WORK !!!!!!!
-    buyer_id = current_user.id  # request.form["buyer_id"]
-    sku = request.form["sku"]
+def remove_from_cart(sku):                                           # THIS DOES NOT YET WORK !!!!!!!
+    buyer_id = current_user.id
+    print(sku)
     # relations.Cart.delete_from_cart(sku, buyer_id)
-    item = db.session.query(relations.Cart).filter(relations.Cart.sku == sku, relations.Cart.buyer_id == buyer_id)
+    item = db.session.query(relations.Cart).filter(relations.Cart.sku == sku, relations.Cart.buyer_id == buyer_id).first()
     db.session.delete(item)
     db.session.commit()
-    return redirect('/'+str(buyer_id)+'/cart')   # Change the 1 to be a buyer_id variable
+    return redirect('/cart')   # Change the 1 to be a buyer_id variable
 
 
 """ Functions for checkout """
