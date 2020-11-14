@@ -225,11 +225,24 @@ def remove_from_cart(sku):                                           # THIS DOES
 def checkout():
     user_id = current_user.id
     # Address query
-    address_query = db.session.query(relations.User.address).filter(relations.User.id == user_id).first()
-    address = {'address': address_query.address}
+    address = get_address()
     # Cart query
     cart_result, total_cost = get_cart_info()
-    return render_template('checkout.html', address=address, cart=cart_result, totalcost=round(total_cost, 2))
+    credit_card_query = db.session.query(relations.PaysWith).filter(relations.PaysWith.buyer_id == user_id).first()
+    if credit_card_query is None:
+        card = 'No card on file.'
+    else:
+        card = credit_card_query.credit_card
+    card_dict = {'card': card}
+    return render_template('checkout.html', address=address,
+                           cart=cart_result, totalcost=round(total_cost, 2), card=card_dict)
+
+
+def get_address():
+    user_id = current_user.id
+    address_query = db.session.query(relations.User.address).filter(relations.User.id == user_id).first()
+    address = {'address': address_query.address}
+    return address
 
 
 def get_cart_info():
@@ -259,6 +272,11 @@ def place_order():
     invalid_items = list()
     buyer_id = current_user.id
     cart_result, total_cost = get_cart_info()
+    address = get_address()
+    credit_card_query = db.session.query(relations.PaysWith).filter(relations.PaysWith.buyer_id == buyer_id).first()
+    if credit_card_query.credit_card is None:
+        flash('ERROR: No credit card on file')
+        return render_template('checkout.html', address=address, cart=cart_result, totalcost=round(total_cost, 2))
     for item in cart_result:
         if item['quantity'] > 0:
             # remove items from cart
@@ -287,7 +305,10 @@ def place_order():
                                          quantity_ordered=item["quantity"], price_at_order=item["price"])
         db.session.add(new_oc)
         db.session.commit()
-    # remove items from item table
+    # Add to places
+    new_places = relations.Places(order_id=new_order.order_id, buyer_id=buyer_id)
+    db.session.add(new_places)
+    db.session.commit()
     return redirect(url_for('main'))
 
 
