@@ -274,9 +274,11 @@ def place_order():
     cart_result, total_cost = get_cart_info()
     address = get_address()
     credit_card_query = db.session.query(relations.PaysWith).filter(relations.PaysWith.buyer_id == buyer_id).first()
-    if credit_card_query.credit_card is None:
+    if credit_card_query is None:
+        card_dict = {'card': 'No card on file.'}
         flash('ERROR: No credit card on file')
-        return render_template('checkout.html', address=address, cart=cart_result, totalcost=round(total_cost, 2))
+        return render_template('checkout.html', address=address, cart=cart_result,
+                               totalcost=round(total_cost, 2), card=card_dict)
     for item in cart_result:
         if item['quantity'] > 0:
             # remove items from cart
@@ -309,6 +311,8 @@ def place_order():
     new_places = relations.Places(order_id=new_order.order_id, buyer_id=buyer_id)
     db.session.add(new_places)
     db.session.commit()
+    new_payment = relations.RequiresPayment(order_id=new_order.order_id,
+                                            credit_card_number=credit_card_query.credit_card)
     return redirect(url_for('main'))
 
 
