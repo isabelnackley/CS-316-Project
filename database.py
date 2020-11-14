@@ -115,11 +115,11 @@ def review(sku, seller_id, buyer_id):
 def item_page(sku):
     query = db.session.query(relations.Item.sku, relations.Item.title, relations.Item.category, relations.Item.price,
                              relations.Item.rating, relations.Item.description, relations.Item.seller,
-                             relations.Item.image).filter(relations.Item.sku == sku)
+                             relations.Item.image, relations.Item.quantity).filter(relations.Item.sku == sku)
     query = query[0]
     item = {'sku': query.sku, 'title': query.title, 'category': query.category, 'price': query.price,
             'rating': query.rating, 'description': query.description, 'seller': query.seller,
-            'image': query.image}
+            'image': query.image, 'quantity': query.quantity}
     return render_template('item.html', items=item)
 
 
@@ -201,7 +201,7 @@ def search_results(search):
 
 @app.route('/cart')
 @login_required
-def cart_page(buyer_id):
+def cart_page():
     buyer_id = current_user.id
     result = list()
     total_cost = 0
@@ -233,16 +233,16 @@ def add_to_cart():
     return redirect(url_for('main'))
 
 
-@app.route("/removeFromCart", methods=["POST"])
+@app.route("/removeFromCart/<sku>", methods=["GET", "POST"])
 @login_required
-def remove_from_cart():                                           # THIS DOES NOT YET WORK !!!!!!!
-    buyer_id = current_user.id  # request.form["buyer_id"]
-    sku = request.form["sku"]
+def remove_from_cart(sku):                                           # THIS DOES NOT YET WORK !!!!!!!
+    buyer_id = current_user.id
+    print(sku)
     # relations.Cart.delete_from_cart(sku, buyer_id)
-    item = db.session.query(relations.Cart).filter(relations.Cart.sku == sku, relations.Cart.buyer_id == buyer_id)
+    item = db.session.query(relations.Cart).filter(relations.Cart.sku == sku, relations.Cart.buyer_id == buyer_id).first()
     db.session.delete(item)
     db.session.commit()
-    return redirect('/'+str(buyer_id)+'/cart')   # Change the 1 to be a buyer_id variable
+    return redirect('/cart')   # Change the 1 to be a buyer_id variable
 
 
 """ Functions for checkout """
@@ -253,37 +253,95 @@ def remove_from_cart():                                           # THIS DOES NO
 def checkout():
     user_id = current_user.id
     # Address query
+    address = get_address()
+    # Cart query
+    cart_result, total_cost = get_cart_info()
+    credit_card_query = db.session.query(relations.PaysWith).filter(relations.PaysWith.buyer_id == user_id).first()
+    if credit_card_query is None:
+        card = 'No card on file.'
+    else:
+        card = credit_card_query.credit_card
+    card_dict = {'card': card}
+    return render_template('checkout.html', address=address,
+                           cart=cart_result, totalcost=round(total_cost, 2), card=card_dict)
+
+
+def get_address():
+    user_id = current_user.id
     address_query = db.session.query(relations.User.address).filter(relations.User.id == user_id).first()
     address = {'address': address_query.address}
-    # Cart query
+    return address
+
+
+def get_cart_info():
+    user_id = current_user.id
     cart_result = list()
     total_cost = 0
     cart_query = db.session.query(relations.Cart.buyer_id,
                                   relations.Cart.sku).filter(relations.Cart.buyer_id == user_id)
     for row in cart_query:
-        item_query = db.session.query(relations.Item.sku, relations.Item.title, relations.Item.category,
-                                      relations.Item.price,
-                                      relations.Item.rating, relations.Item.description, relations.Item.seller,
-                                      relations.Item.image).filter(relations.Item.sku == row.sku)
+        item_query = db.session.query(relations.Item.sku, relations.Item.title,
+                                      relations.Item.category, relations.Item.price,
+                                      relations.Item.rating, relations.Item.description,
+                                      relations.Item.seller, relations.Item.image,
+                                      relations.Item.quantity).filter(relations.Item.sku == row.sku)
         item_query = item_query[0]
         item = {'sku': item_query.sku, 'title': item_query.title, 'category': item_query.category,
                 'price': item_query.price, 'rating': item_query.rating, 'description': item_query.description,
-                'seller': item_query.seller, 'image': item_query.image}
+                'seller': item_query.seller, 'image': item_query.image, 'quantity': item_query.quantity}
         total_cost = total_cost + item_query.price
         cart_result.append(item)
-    return render_template('checkout.html', address=address, cart=cart_result, totalcost=round(total_cost, 2))
+    return cart_result, total_cost
 
 
 @app.route('/placeorder', methods=["GET", "POST"])
 @login_required
 def place_order():
+    invalid_items = list()
+    buyer_id = current_user.id
+    cart_result, total_cost = get_cart_info()
+    address = get_address()
+    credit_card_query = db.session.query(relations.PaysWith).filter(relations.PaysWith.buyer_id == buyer_id).first()
+    if credit_card_query is None:
+        card_dict = {'card': 'No card on file.'}
+        flash('ERROR: No credit card on file')
+        return render_template('checkout.html', address=address, cart=cart_result,
+                               totalcost=round(total_cost, 2), card=card_dict)
+    for item in cart_result:
+        if item['quantity'] > 0:
+            # remove items from cart
+            cart_query = db.session.query(relations.Cart).filter(relations.Cart.sku == item["sku"],
+                                                                 relations.Cart.buyer_id == buyer_id).first()
+            db.session.delete(cart_query)
+            db.session.commit()
+            item_query = db.session.query(relations.Item).filter(relations.Item.sku == item["sku"]).first()
+            item_query.quantity = item["quantity"] - 1
+            relations.Item.updateItem(item_query.title, item_query.description, item_query.category,
+                                      item_query.quantity, item_query.price, item_query.image, item_query.sku)
+            db.session.commit()
+            flash('Purchase Successful.')
+        else:
+            total_cost = total_cost - item["price"]
+            flash(f'ERROR: Could not purchase item {item["title"]}')
+            cart_result.remove(item)
     # Add order to order table
-    # remove items from item table
-    # remove items from cart
-    flash('Purchase Successful.')
+
+    new_order = relations.Order(total_price=total_cost, buyer_id=buyer_id)
+    db.session.add(new_order)
+    db.session.commit()
+    print(new_order.order_id)
+    for item in cart_result:
+        new_oc = relations.OrdersContain(order_id=new_order.order_id, sku=item["sku"],
+                                         quantity_ordered=item["quantity"], price_at_order=item["price"])
+        db.session.add(new_oc)
+        db.session.commit()
+    # Add to places
+    new_places = relations.Places(order_id=new_order.order_id, buyer_id=buyer_id)
+    db.session.add(new_places)
+    db.session.commit()
+    new_payment = relations.RequiresPayment(order_id=new_order.order_id,
+                                            credit_card_number=credit_card_query.credit_card)
     return redirect(url_for('main'))
-
-
 
 
 """Functions for the user profile"""

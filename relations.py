@@ -188,6 +188,12 @@ class Order(db.Model):
     time_stamp = db.Column('time_stamp', db.DateTime())
     buyer_id = db.Column('buyer_id', db.Integer())
 
+    @staticmethod
+    def last_order():
+        last = db.session.execute("SELECT LAST_INSERT_ID() FROM Orders")
+        print(last)
+        return last
+
     def __init__(self, order_id=None, total_price=None, time_stamp=None,
                  buyer_id=None):
         self.order_id = order_id
@@ -231,8 +237,8 @@ class Places(db.Model):
 
 class Cart(db.Model):
     __tablename__ = 'Cart'
-    buyer_id = db.Column('buyer_id', db.Integer(), ForeignKey('Users.id'), primary_key=True)
-    sku = db.Column('SKU', db.Integer(), ForeignKey('Items.SKU'), primary_key=True)
+    buyer_id = db.Column('buyer_id', db.Integer(), primary_key=True)
+    sku = db.Column('SKU', db.Integer(), primary_key=True)
 
     @staticmethod
     def delete_from_cart(sku, buyer_id):

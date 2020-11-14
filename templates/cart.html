@@ -21,12 +21,10 @@
                             <button class="btn btn-secondary btn-lg">View Item</button>
                         </a>
                     </div>
-                    <div class="col align-items-center justify-content-center">
-                        <form action="/removeFromCart" method="post">
-                            <input type="hidden" name="buyer_id" value={{ user }}><br><br>
-                            <input type="hidden" name="sku" value={{ items.sku }}><br><br>
-                            <input type="submit" value="Remove From Cart" style="color:red">
-                        </form>
+                    <div class="col">
+                        <a href="{{ url_for('remove_from_cart', sku=item.sku) }}">
+                            <button class="btn btn-secondary btn-sm btn-danger">Remove From Cart</button>
+                        </a>
                     </div>
                 </div>
         <hr/>
