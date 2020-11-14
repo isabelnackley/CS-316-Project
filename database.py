@@ -408,6 +408,44 @@ def change_password():
     return "Password successfully updated."
 
 
+@app.route("/profile/history", methods=["GET", "POST"])
+def order_history():
+    order_result = list()
+    user_id = current_user.id
+    history_query = db.session.query(relations.Order.order_id, relations.Order.time_stamp,
+                                     relations.Order.total_price).filter(relations.Order.buyer_id == user_id)
+    for row in history_query:
+        order = {'order_id': row.order_id, 'time_stamp': row.time_stamp,
+                 'total_price': row.total_price}
+        order_result.append(order)
+    return render_template('orderhistory.html', orders=order_result)
+
+
+@app.route("/profile/history/<order_id>", methods=["GET", "POST"])
+def order_info(order_id):
+    order_query = db.session.query(relations.OrdersContain.sku,
+                                   relations.OrdersContain.price_at_order,
+                                   relations.OrdersContain.quantity_ordered).filter(
+        relations.OrdersContain.order_id == order_id)
+    info_query = db.session.query(relations.Order.time_stamp,
+                                  relations.Order.total_price).filter(relations.Order.order_id == order_id)
+    info_query = info_query[0]
+    info_dict = {'order_id': order_id, 'time_stamp': info_query.time_stamp, 'total_price': info_query.total_price}
+    item_list = list()
+    for row in order_query:
+        item_query = db.session.query(relations.Item.sku, relations.Item.title, relations.Item.category,
+                                      relations.Item.price,
+                                      relations.Item.rating, relations.Item.description, relations.Item.seller,
+                                      relations.Item.image,
+                                      relations.Item.quantity).filter(relations.Item.sku == row.sku)
+        query = item_query[0]
+        item = {'sku': query.sku, 'title': query.title, 'category': query.category, 'price': row.price_at_order,
+                'rating': query.rating, 'description': query.description, 'seller': query.seller,
+                'image': query.image, 'quantity': row.quantity_ordered}
+        item_list.append(item)
+    return render_template('orderinfo.html', orders=item_list, info=info_dict)
+
+
 if __name__ == '__main__':
     app.run()
     # print(db.session.query(relations.User.id, relations.User.is_buyer).all())
