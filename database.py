@@ -8,7 +8,7 @@ from werkzeug.datastructures import MultiDict
 
 import relations
 from forms import AddItemForm, EditProfileForm, EditItemForm, WriteReviewForm, LoginForm, ForgotPasswordForm, \
-    VerifyEmailForm
+    VerifyEmailForm, SearchItemsForm
 
 SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://test:password@152.3.52.135/test1'
 
@@ -28,6 +28,8 @@ login_manager.init_app(app)
 @app.route('/')
 def main():
     result = list()
+    form = SearchItemsForm()
+    search_string = form.item.data
     query = db.session.query(relations.Item.sku, relations.Item.title, relations.Item.category, relations.Item.price,
                              relations.Item.rating, relations.Item.seller, relations.Item.image).all()
 
@@ -36,7 +38,7 @@ def main():
                 'rating': row.rating, 'seller': row.seller, 'image': row.image}
         result.append(temp)
 
-    return render_template('index.html', items=result)
+    return render_template('index.html', items=result, form=form)
 
 
 @login_manager.user_loader
