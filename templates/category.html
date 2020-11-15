@@ -1,0 +1,20 @@
+{% extends "header.html" %}
+
+{% block title %}{{ name.name }}{% endblock %}
+
+{% block content %}
+    <h1 class="text-center">{{ name.name }}</h1><br>
+{% for item in items %}
+    <div class="text-center"> <h5>{{item.title}}</h5></div><br>
+    <img src="{{ item.image }}" class="img-rounded" width="300"><br>
+    <div class="text-center"> Price: {{item.price}}</div>
+    <div class="row">
+        <div class="col text-center">
+            <a href="{{ url_for('item_page', sku=item.sku) }}">
+                <button class="btn btn-secondary btn-lg">View Item</button>
+            </a>
+        </div>
+    </div><br><br><br>
+{% endfor %}
+    </div>
+{% endblock %}
