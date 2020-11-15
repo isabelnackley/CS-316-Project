@@ -297,7 +297,6 @@ def get_cart_info():
 @app.route('/placeorder', methods=["GET", "POST"])
 @login_required
 def place_order():
-    invalid_items = list()
     buyer_id = current_user.id
     cart_result, total_cost = get_cart_info()
     address = get_address()
@@ -341,6 +340,8 @@ def place_order():
     db.session.commit()
     new_payment = relations.RequiresPayment(order_id=new_order.order_id,
                                             credit_card_number=credit_card_query.credit_card)
+    db.session.add(new_payment)
+    db.session.commit()
     return redirect(url_for('main'))
 
 

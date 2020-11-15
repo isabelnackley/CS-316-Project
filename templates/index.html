@@ -8,16 +8,7 @@
         <div class="jumbotron">
             <h1 class="text-center">Items</h1>
             <p class="text-center">Scroll through the following items to see what<br>
-               you like or click the Add Item button to upload<br>
-               an item to sell!</p>
-            <div class="row">
-                <div class="col text-center">
-                    <a href="{{ url_for('add_item') }}">
-                        <button class="btn btn-secondary btn-lg"> Add New Item</button>
-                    </a>
-                </div>
-
-            </div>
+               you like or use the search bar to search the items!</p>
         </div>
 {% for item in items %}
     <div class="text-center"> <h5>{{item.title}}</h5></div><br>
