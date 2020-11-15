@@ -25,13 +25,16 @@ login_manager.init_app(app)
 """Functions for the main page"""
 
 
-@app.route('/')
+@app.route('/', methods=["GET", "POST"])
 def main():
     result = list()
     form = SearchItemsForm()
     search_string = form.item.data
-    query = db.session.query(relations.Item.sku, relations.Item.title, relations.Item.category, relations.Item.price,
-                             relations.Item.rating, relations.Item.seller, relations.Item.image).all()
+    if search_string is None:
+        query = db.session.query(relations.Item.sku, relations.Item.title, relations.Item.category, relations.Item.price,
+                                 relations.Item.rating, relations.Item.seller, relations.Item.image).all()
+    else:
+        query = db.session.query(relations.Item).filter(relations.Item.title.like(f'%{search_string}%'))
 
     for row in query:
         temp = {'sku': row.sku, 'title': row.title, 'category': row.category, 'price': row.price,
