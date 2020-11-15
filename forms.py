@@ -38,7 +38,7 @@ class EditItemForm(FlaskForm):
 
 
 class WriteReviewForm(FlaskForm):
-    star_rating = IntegerField('Star Rating', [DataRequired()])
+    star_rating = SelectField('Star Rating', choices=['1','2','3','4','5'])
     written_rating = TextField('Written Review')
     submit = SubmitField('Submit')
 
@@ -58,6 +58,16 @@ class VerifyEmailForm(FlaskForm):
     email = StringField('Email', [DataRequired()])
     submit = SubmitField('Enter')
 
+
+class CreateProfileForm(FlaskForm):
+    """Form to create user profile"""
+    is_seller = SelectField('Would you like to sign up as a seller?', choices=['Yes', 'No'], validators=[DataRequired()])
+    email = StringField('Email', validators=[DataRequired()])
+    password = StringField('Password', validators=[DataRequired()])
+    question = StringField('Secret Question', validators=[DataRequired()])
+    answer = StringField('Answer', validators=[DataRequired()])
+    address = StringField('Shipping Address', validators=[DataRequired()])
+    submit = SubmitField('Submit')
 
 class SearchItemsForm(FlaskForm):
     item = StringField('Search Items', [DataRequired()])
