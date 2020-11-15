@@ -3,7 +3,7 @@ from flask import Flask, render_template, redirect, url_for, jsonify, request, f
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, login_user, current_user, login_required
 import os
-from sqlalchemy import or_
+from sqlalchemy import or_, func
 import pymysql
 from werkzeug.datastructures import MultiDict
 
@@ -123,17 +123,30 @@ def create_profile():
 """Functions for the items"""
 
 
-@app.route('/item/<sku>/<seller_id>/<buyer_id>/review', methods=["POST"])
-def review(sku, seller_id, buyer_id):
-    query = db.session.query(relations.Item.title).filter(relations.Item.sku == sku).first()
-    item = {'title': query.title}
+@app.route('/item/<sku>/review', methods=["GET", "POST"])
+def review(sku):
+    item = db.session.query(relations.Item).filter(relations.Item.sku == sku).first()
+    title = {'title': item.title}
     form = WriteReviewForm()
-    new_review = relations.Review(seller_id=seller_id, buyer_id=buyer_id, sku=sku, item_rating=form.star_rating,
-                                  written_review=form.written_rating)
-    db.session.add(new_review)
-    db.session.commit()
+    if form.validate_on_submit():
+        new_review = relations.Review(seller_id=item.seller, buyer_id=current_user.id, sku=sku, item_rating=form.star_rating.data, seller_rating=0,
+                                      written_review=form.written_rating.data)
+
+        db.session.add(new_review)
+        item_rating = db.session.query(func.avg(relations.Review.item_rating).label('average')).filter_by(sku=sku).scalar()
+        print("yes")
+        seller_rating = db.session.query(func.avg(relations.Review.item_rating)).filter_by(seller_id=item.seller).all()
+        print(item_rating)
+        db.session.query(relations.Item).filter_by(sku=sku).update({relations.Item.rating: item_rating})
+        print("yes")
+        #db.session.query(relations.Seller).filter_by(id=item.seller).update({relations.Seller.rating: seller_rating})
+        print("yes")
+        db.session.commit()
+        print("yes")
+        return redirect(url_for('item_page', sku=sku))
+
     # TODO: Validate that item being reviewed is sold by seller and has been bought by buyer
-    return render_template('review.html', item=item, form=form)
+    return render_template('review.html', item=title, form=form)
 
 
 @app.route('/item/<sku>', methods=["GET"])

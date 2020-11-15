@@ -17,6 +17,11 @@
                         <input type="submit" value="Add To Cart">
                     </form>
                 </div>
+                <div class="col text-right">
+                    <a href="{{ url_for('review', sku = items.sku) }}">
+                        <button class="btn btn-secondary btn-sm"> Leave a Review</button>
+                    </a>
+                </div>
             </div><br><br>
         </div>
     </div>

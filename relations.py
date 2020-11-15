@@ -99,7 +99,7 @@ class Review(db.Model):
     __tablename__ = 'Reviews'
     seller_id = db.Column('seller_id', db.Integer(), ForeignKey('Sellers.id'), primary_key=True)
     buyer_id = db.Column('buyer_id', db.Integer(), ForeignKey('Buyers.id'), primary_key=True)
-    sku = db.Column('SKU', db.Integer(), ForeignKey('Items.SUK'), primary_key=True)
+    sku = db.Column('SKU', db.Integer(), ForeignKey('Items.SKU'), primary_key=True)
     seller_rating = db.Column('seller_rating', db.Integer())
     item_rating = db.Column('item_rating', db.Integer())
     written_review = db.Column('written_review', db.String(256))
