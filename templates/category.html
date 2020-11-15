@@ -1,17 +1,9 @@
 {% extends "header.html" %}
 
-{% block title %}Mini Amazon{% endblock %}
+{% block title %}{{ name.name }}{% endblock %}
 
 {% block content %}
-
-    <div class="container">
-        <div class="jumbotron">
-            <form action="" method="post" style="text-align:center" novalidate>
-                <div><h1>{{ form.item.label }}</h1></div>
-                <br><br>
-                <div> {{ form.item(size=50) }}        {{ form.submit() }}</div>
-            </form>
-        </div>
+    <h1 class="text-center">{{ name.name }}</h1><br>
 {% for item in items %}
     <div class="text-center"> <h5>{{item.title}}</h5></div><br>
     <img src="{{ item.image }}" class="img-rounded" width="300"><br>
