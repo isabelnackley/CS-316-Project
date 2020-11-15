@@ -25,6 +25,7 @@ class EditProfileForm(FlaskForm):
     answer = TextField('Answer', [DataRequired()])
     submit = SubmitField('Submit')
 
+
 class EditItemForm(FlaskForm):
     """Form to edit seller's item"""
     title = TextField('Title', [DataRequired()])
@@ -35,20 +36,29 @@ class EditItemForm(FlaskForm):
     image = TextField('Image', [DataRequired()])
     submit = SubmitField('Submit')
 
+
 class WriteReviewForm(FlaskForm):
     star_rating = IntegerField('Star Rating', [DataRequired()])
     written_rating = TextField('Written Review')
     submit = SubmitField('Submit')
+
 
 class LoginForm(FlaskForm):
     email = StringField('Email', [DataRequired()])
     password = StringField('Password', [DataRequired()])
     submit = SubmitField('Log In')
 
+
 class ForgotPasswordForm(FlaskForm):
     answer = StringField('Answer', [DataRequired()])
     submit = SubmitField('Enter')
 
+
 class VerifyEmailForm(FlaskForm):
     email = StringField('Email', [DataRequired()])
     submit = SubmitField('Enter')
+
+
+class SearchItemsForm(FlaskForm):
+    item = StringField('Search Items', [DataRequired()])
+    submit = SubmitField('Search')

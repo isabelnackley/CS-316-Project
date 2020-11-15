@@ -3,12 +3,13 @@ from flask import Flask, render_template, redirect, url_for, jsonify, request, f
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, login_user, current_user, login_required
 import os
+from sqlalchemy import or_
 import pymysql
 from werkzeug.datastructures import MultiDict
 
 import relations
 from forms import AddItemForm, EditProfileForm, EditItemForm, WriteReviewForm, LoginForm, ForgotPasswordForm, \
-    VerifyEmailForm
+    VerifyEmailForm, SearchItemsForm
 
 SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://test:password@152.3.52.135/test1'
 
@@ -25,18 +26,25 @@ login_manager.init_app(app)
 """Functions for the main page"""
 
 
-@app.route('/')
+@app.route('/', methods=["GET", "POST"])
 def main():
     result = list()
-    query = db.session.query(relations.Item.sku, relations.Item.title, relations.Item.category, relations.Item.price,
-                             relations.Item.rating, relations.Item.seller, relations.Item.image).all()
+    form = SearchItemsForm()
+    search_string = form.item.data
+    if search_string is None:
+        query = db.session.query(relations.Item.sku, relations.Item.title, relations.Item.category, relations.Item.price,
+                                 relations.Item.rating, relations.Item.seller, relations.Item.image).all()
+    else:
+        query = db.session.query(relations.Item).filter(or_(relations.Item.title.like(f'%{search_string}%'),
+                                                            relations.Item.seller.like(f'%{search_string}%'),
+                                                            relations.Item.category.like(f'%{search_string}%')))
 
     for row in query:
         temp = {'sku': row.sku, 'title': row.title, 'category': row.category, 'price': row.price,
                 'rating': row.rating, 'seller': row.seller, 'image': row.image}
         result.append(temp)
 
-    return render_template('index.html', items=result)
+    return render_template('index.html', items=result, form=form)
 
 
 @login_manager.user_loader

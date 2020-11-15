@@ -6,9 +6,11 @@
 
     <div class="container">
         <div class="jumbotron">
-            <h1 class="text-center">Items</h1>
-            <p class="text-center">Scroll through the following items to see what<br>
-               you like or use the search bar to search the items!</p>
+            <form action="" method="post" style="text-align:center" novalidate>
+                <div><h1>{{ form.item.label }}</h1></div>
+                <br><br>
+                <div> {{ form.item(size=50) }}        {{ form.submit() }}</div>
+            </form>
         </div>
 {% for item in items %}
     <div class="text-center"> <h5>{{item.title}}</h5></div><br>
