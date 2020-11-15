@@ -3,7 +3,7 @@
     <div class="container">
         <div class="jumbotron">
             <h2 class="text-center">Verify Your Email</h2>
-            <form action="" method="post" style="text-align:center" novalidate>
+            <form action="" method="post" style="text-align:center" novalidate> {{ form.csrf_token }}
                 <div><h4>{{ form.email.label }}</h4><br>{{ form.email }}</div>
                 <div>{{ form.submit() }}</div>
             </form>

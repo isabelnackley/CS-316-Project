@@ -5,13 +5,11 @@ from wtforms.validators import DataRequired
 
 class AddItemForm(FlaskForm):
     """Form to add a new item to the database"""
-    sku = IntegerField('SKU', [DataRequired()])
     title = TextField('Title', [DataRequired()])
     description = TextField('Description', [DataRequired()])
     category = StringField('Category', [DataRequired()])
     quantity = IntegerField('Quantity', [DataRequired()])
     price = DecimalField('Price', [DataRequired()], places=2)
-    seller = IntegerField('Seller', [DataRequired()])
     image = StringField('Image')
     submit = SubmitField('Submit')
 
@@ -72,3 +70,8 @@ class CreateProfileForm(FlaskForm):
 class SearchItemsForm(FlaskForm):
     item = StringField('Search Items', [DataRequired()])
     submit = SubmitField('Search')
+
+class AddPaymentMethodForm(FlaskForm):
+    credit_card = IntegerField('Credit Card Number', [DataRequired()])
+    address = StringField('Billing Address', [DataRequired()])
+    submit = SubmitField('Submit')

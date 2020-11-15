@@ -25,4 +25,13 @@
             </div><br><br>
         </div>
     </div>
+    <div class="container">
+        <div class="jumbotron">
+            <h2 class="text-center">Reviews</h2>
+            {% for review in reviews %}
+               <br> <div> Rating: {{review.item_rating}} Stars</div>
+                <div> Written Review: {{review.written_review}}</div> </br>
+            {% endfor %}
+        </div>
+    </div>
 {% endblock %}

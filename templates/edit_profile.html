@@ -3,7 +3,7 @@
     <div class="container">
         <div class="jumbotron">
             <h2 class="text-center">Edit Profile</h2>
-            <form action="" method="post" style="text-align:center" novalidate>
+            <form action="" method="post" style="text-align:center" novalidate> {{ form.csrf_token }}
                 <div><h4>{{ form.email.label }}</h4><br>{{ form.email }}</div>
                 <div><h4>{{ form.password.label }}</h4><br>{{ form.password }}</div>
                 <div><h4>{{ form.question.label }}</h4><br>{{ form.question }}</div>

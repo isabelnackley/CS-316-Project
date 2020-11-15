@@ -50,13 +50,14 @@ class Buyer(db.Model):
 class Seller(db.Model):
     __tablename__ = 'Sellers'
     id = db.Column('id', db.Integer(), ForeignKey('Users.id'), primary_key=True)
+    rating = db.Column('rating', db.Float())
 
-    def __init__(self, id=None):  # , rating = None):
+    def __init__(self, id=None, rating=None):
         self.id = id
-        # self.rating = rating
+        self.rating = rating
 
     def __repr__(self):
-        return '<Seller %r' % self.model
+        return '<Seller %r>' % self.model
 
 
 class Item(db.Model):

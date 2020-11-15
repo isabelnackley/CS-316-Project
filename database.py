@@ -1,15 +1,15 @@
 # database
 from flask import Flask, render_template, redirect, url_for, jsonify, request, flash
 from flask_sqlalchemy import SQLAlchemy
-from flask_login import LoginManager, login_user, current_user, login_required
+from flask_login import LoginManager, login_user, current_user, login_required, logout_user
 import os
 from sqlalchemy import or_, func
 import pymysql
 from werkzeug.datastructures import MultiDict
 
 import relations
-from forms import AddItemForm, EditProfileForm, EditItemForm, WriteReviewForm, LoginForm, ForgotPasswordForm, VerifyEmailForm, CreateProfileForm,SearchItemsForm
-
+from forms import AddItemForm, EditProfileForm, EditItemForm, WriteReviewForm, LoginForm, ForgotPasswordForm, \
+    VerifyEmailForm, CreateProfileForm, SearchItemsForm, AddPaymentMethodForm
 
 SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://test:password@152.3.52.135/test1'
 
@@ -60,35 +60,46 @@ def load_user(user_id):
 
 @login_manager.unauthorized_handler
 def unauthorized():
+    flash("You must be logged in to view that page.")
     return redirect(url_for('login'))
-    #TODO: add flash message "You must be logged in to view that page."
+
 
 
 @app.route('/login', methods=["POST", "GET"])
 def login():
     if current_user.is_authenticated:
+        flash("You are already logged in")
         return redirect(url_for('main'))
     form = LoginForm()
-    if request.method == "POST":
+    if form.validate_on_submit():
         user = db.session.query(relations.User).filter_by(email=form.email.data).first()
-        print(form.email.data)
         if user and user.password==form.password.data:
-            print(form.password.data)
             login_user(user)
             return redirect(url_for('main'))
-        # TODO: add flash of incorrect username/password
+        flash("Invalid Username and/or Password")
         return redirect(url_for('login'))
     return render_template('login.html', form=form)
+
+@app.route('/logout', methods=["GET"])
+def logout():
+    if current_user.is_authenticated:
+        logout_user()
+        flash("You have logged out")
+        return redirect(url_for('main'))
+    flash("You are not logged in")
+    return redirect(url_for('main'))
 
 @app.route('/verifyemail', methods=["GET", "POST"])
 def verify_email():
     if current_user.is_authenticated:
         return redirect(url_for('main'))
     form = VerifyEmailForm()
-    if request.method == 'POST':
+    if form.validate_on_submit():
         user = db.session.query(relations.User).filter_by(email=form.email.data).first()
         if user:
             return redirect(url_for('forgot_password', user=user.id))
+        flash("Account does not exist")
+        return redirect(url_for('verify_email'))
     return render_template('verify_email.html', form=form)
 
 
@@ -100,10 +111,12 @@ def forgot_password(user):
     question = user_object.question
     password= ""
     form = ForgotPasswordForm()
-    if request.method == 'POST':
+    if form.validate_on_submit():
         if user and user_object.answer==form.answer.data:
             password= user_object.password
             return render_template('forgot_password.html', form=form, password=password, question=question)
+        flash("Invalid Answer")
+        return redirect(url_for('forgot_password', user=user))
     return render_template('forgot_password.html', form=form, password=password,  question=question)
 
 
@@ -136,6 +149,8 @@ def create_profile():
             user_id = len(db.session.query(relations.User).all()) + 1
             if form.is_seller.data == 'Yes':
                 seller = 1
+                new_seller = relations.Seller(id=user_id, rating=None)
+                db.session.add(new_seller)
             elif form.is_seller.data == 'No':
                 seller = 0
             new_user = relations.User(id=user_id, is_seller=seller, email=form.email.data,
@@ -143,8 +158,11 @@ def create_profile():
                                       answer=form.answer.data, address=form.address.data)
             db.session.add(new_user)
             db.session.commit()
+            login_user(new_user)
+            flash('You are now logged in')
             return redirect(url_for('main'))
-        #TODO: show message that user already exists under this email
+        flash('Account already exists for this user')
+        return redirect(url_for('create_profile'))
     return render_template('create_profile.html', form=form)
 
 
@@ -152,28 +170,26 @@ def create_profile():
 
 
 @app.route('/item/<sku>/review', methods=["GET", "POST"])
+@login_required
 def review(sku):
     item = db.session.query(relations.Item).filter(relations.Item.sku == sku).first()
     title = {'title': item.title}
     form = WriteReviewForm()
     if form.validate_on_submit():
-        new_review = relations.Review(seller_id=item.seller, buyer_id=current_user.id, sku=sku, item_rating=form.star_rating.data, seller_rating=0,
-                                      written_review=form.written_rating.data)
+        existing_review = db.session.query(relations.Review).filter(relations.Review.sku==sku and relations.Review.buyer_id==current_user.id)
+        if existing_review == None:
+            new_review = relations.Review(seller_id=item.seller, buyer_id=current_user.id, sku=sku, item_rating=form.star_rating.data, seller_rating=0,
+                                          written_review=form.written_rating.data)
 
-        db.session.add(new_review)
-        item_rating = db.session.query(func.avg(relations.Review.item_rating).label('average')).filter_by(sku=sku).scalar()
-        print("yes")
-        seller_rating = db.session.query(func.avg(relations.Review.item_rating)).filter_by(seller_id=item.seller).all()
-        print(item_rating)
-        db.session.query(relations.Item).filter_by(sku=sku).update({relations.Item.rating: item_rating})
-        print("yes")
-        #db.session.query(relations.Seller).filter_by(id=item.seller).update({relations.Seller.rating: seller_rating})
-        print("yes")
-        db.session.commit()
-        print("yes")
+            db.session.add(new_review)
+            item_rating = db.session.query(func.avg(relations.Review.item_rating).label('average')).filter_by(sku=sku).scalar()
+            seller_rating = db.session.query(func.avg(relations.Review.item_rating)).filter_by(seller_id=item.seller).all()
+            db.session.query(relations.Item).filter_by(sku=sku).update({relations.Item.rating: item_rating})
+            db.session.query(relations.Seller).filter_by(id=item.seller).update({relations.Seller.rating: seller_rating})
+            db.session.commit()
+            return redirect(url_for('item_page', sku=sku))
+        flash("You have already reviewed this item")
         return redirect(url_for('item_page', sku=sku))
-
-    # TODO: Validate that item being reviewed is sold by seller and has been bought by buyer
     return render_template('review.html', item=title, form=form)
 
 
@@ -188,20 +204,22 @@ def item_page(sku):
             'image': query.image, 'quantity': query.quantity}
     cat_list = list()
     categories = db.session.query(relations.Item.category).distinct()
+    reviews = db.session.query(relations.Review.item_rating, relations.Review.written_review).filter_by(sku=sku)
     for row in categories:
         temp = {'name': row.category}
         cat_list.append(temp)
-    return render_template('item.html', items=item, categories=cat_list)
+    return render_template('item.html', items=item, categories=cat_list, reviews=reviews)
 
 
 @app.route("/addItem", methods=['GET', 'POST'])
+@login_required
 def add_item():
     form = AddItemForm()
-    if request.method == 'POST':
-        print("Add Item Form Validated")
-        new_item = relations.Item(sku=form.sku.data, title=form.title.data, description=form.description.data,
+    sku = len(db.session.query(relations.Item).all()) + 1
+    if form.validate_on_submit():
+        new_item = relations.Item(sku=sku, title=form.title.data, description=form.description.data,
                                   price=form.price.data, category=form.category.data, quantity=form.quantity.data,
-                                  rating=0, seller=form.seller.data, image=form.image.data)
+                                  rating=None, seller=current_user.id, image=form.image.data)
         db.session.add(new_item)
         db.session.commit()
         flash('Item added to inventory.')
@@ -209,16 +227,17 @@ def add_item():
     return render_template('additem.html', form=form)
 
 
-@app.route("/removeItem", methods=["GET", "POST"])
+'''@app.route("/removeItem", methods=["GET", "POST"])
 def remove_item():
     sku = request.get_json()
     item = db.session.query(relations.Item).filterby(sku=sku["sku"])
     db.session.delete(item)
     db.session.commit()
-    return redirect(url_for('main'))
+    return redirect(url_for('main'))'''
 
 
 @app.route("/<sku>/modifyItem", methods=["GET", "POST"])
+@login_required
 def modify_item(sku):
     # TODO: validate that item sku is being sold by seller
     query = db.session.query(relations.Item.title,
@@ -235,10 +254,10 @@ def modify_item(sku):
         form.category.choices = [x.name for x in db.session.query(relations.Category.name).all()]
     elif request.method == 'POST':
         form = EditItemForm()
-        relations.Item.updateItem(form.title.data, form.description.data, form.category.data, form.quantity.data,
-                                  form.price.data, form.image.data, sku)
-        print("Edit Item Form Validated")
-        db.session.commit()
+        if form.validate_on_submit():
+            relations.Item.updateItem(form.title.data, form.description.data, form.category.data, form.quantity.data,
+                                      form.price.data, form.image.data, sku)
+            db.session.commit()
     return render_template('edit_item.html', item=item, form=form)
 
 
@@ -423,13 +442,30 @@ def profile_page():
     user = {'id': query.id, 'is_seller': query.is_seller, 'password': query.password,
             'email': query.email, 'question': query.question, 'answer': query.answer,
             'address': query.address}
+
     if current_user.is_seller == 0:
         return render_template('user_profile.html', user=user)
     if current_user.is_seller == 1:
-        # TODO: validate that user_id is a seller
-        print('seller confirmed')
         return render_template('seller_profile.html', user=user)
 
+@app.route("/paymentmethod", methods=["POST", "GET"])
+def payment_method():
+    payment_info = db.session.query(relations.Payment).join(relations.PaysWith).filter(relations.PaysWith.buyer_id==current_user.id).all()
+    form = AddPaymentMethodForm()
+    if form.validate_on_submit():
+        existing_card = db.session.query(relations.Payment).filter(relations.Payment.credit_card==form.credit_card.data).first()
+        print(existing_card)
+        if existing_card == None:
+            new_payment = relations.Payment(credit_card=form.credit_card.data, address=form.address.data)
+            link_to_buyer = relations.PaysWith(credit_card=form.credit_card.data, buyer_id=current_user.id)
+            db.session.add(new_payment)
+            db.session.add(link_to_buyer)
+            db.session.commit()
+            flash("New Payment Method Added")
+            return redirect(url_for('payment_method'))
+        flash('This card is already being used on this website')
+        return redirect(url_for('payment_method'))
+    return render_template('payment_methods.html', payment_info=payment_info, form=form)
 
 @app.route("/<user_id>/profile/edit", methods=["POST", "GET"])
 def edit_profile(user_id):
@@ -445,14 +481,18 @@ def edit_profile(user_id):
              'answer': query.answer}))
     elif request.method == 'POST':
         form = EditProfileForm()
-        relations.User.updateUser(form.password.data, form.email.data, form.question.data, form.answer.data,
-                                  form.address.data, user_id)
-        print("Edit Profile Form Validated")
-        db.session.commit()
+        if form.validate_on_submit() :
+            existing_user = db.session.query(relations.User).filter_by(email=form.email.data).first()
+            if existing_user == None or existing_user.email == current_user.email:
+                relations.User.updateUser(form.password.data, form.email.data, form.question.data, form.answer.data,
+                                      form.address.data, user_id)
+                db.session.commit()
+                return redirect(url_for('profile_page'))
+            flash("Account already exists with this email")
     return render_template('edit_profile.html', user=user, form=form)
 
 
-@app.route("/<user_id>/sellerpage", methods=["POST", "GET"])
+@app.route("/<user_id>/sellerpage", methods=["GET"])
 def seller_page(user_id):
     result = list()
     query = db.session.query(relations.Item.sku, relations.Item.title, relations.Item.category, relations.Item.price,
@@ -463,16 +503,18 @@ def seller_page(user_id):
                 'rating': row.rating, 'seller': row.seller, 'image': row.image}
         result.append(temp)
 
-    return render_template('seller_page.html', items=result, user=1)
+    seller_rating = db.session.query(relations.Seller.rating).filter(relations.Seller.id == user_id).scalar()
+
+    return render_template('seller_page.html', items=result, rating=seller_rating)
 
 
-@app.route("/account/profile/changePassword", methods=["GET", "POST"])
+'''@app.route("/account/profile/changePassword", methods=["GET", "POST"])
 def change_password():
     in_dict = request.get_json()
     user = User.query.filter_by(id=in_dict["id"]).first()
     user.password = in_dict["password"]
     db.session.commit()
-    return "Password successfully updated."
+    return "Password successfully updated."'''
 
 
 @app.route("/profile/history", methods=["GET", "POST"])

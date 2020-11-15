@@ -3,14 +3,12 @@
     <div class="container">
         <div class="jumbotron">
             <h2 class="text-center">Add New Item</h2>
-            <form action="" method="post" style="text-align:center" novalidate>
-                <div><h4>{{ form.sku.label }}</h4><br>{{ form.sku }}</div>
+            <form action="" method="post" style="text-align:center" novalidate> {{ form.csrf_token }}
                 <div><h4>{{ form.title.label }}</h4><br>{{ form.title }}</div>
                 <div><h4>{{ form.description.label }}</h4><br>{{ form.description }}</div>
                 <div><h4>{{ form.category.label }}</h4><br>{{ form.category }}</div>
                 <div><h4>{{ form.quantity.label }}</h4><br>{{ form.quantity }}</div>
                 <div><h4>{{ form.price.label }}</h4><br>{{ form.price }}</div>
-                <div><h4>{{ form.seller.label }}</h4><br>{{ form.seller }}</div>
                 <div><h4>{{ form.image.label }}</h4><br>{{ form.image }}</div><br><br>
                 <div>{{ form.submit() }}</div>
             </form>
