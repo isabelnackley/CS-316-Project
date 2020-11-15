@@ -22,10 +22,10 @@ class User(UserMixin, db.Model):
         print("User updated")
         db.session.commit()
 
-    def __init__(self, id=None, is_buyer=None, password=None,
+    def __init__(self, id=None, is_seller=None, password=None,
                  email=None, question=None, answer=None, address=None):
         self.id = id
-        self.is_buyer = is_buyer
+        self.is_seller = is_seller
         self.password = password
         self.email = email
         self.question = question

@@ -8,7 +8,7 @@ from werkzeug.datastructures import MultiDict
 
 import relations
 from forms import AddItemForm, EditProfileForm, EditItemForm, WriteReviewForm, LoginForm, ForgotPasswordForm, \
-    VerifyEmailForm
+    VerifyEmailForm, CreateProfileForm
 
 SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://test:password@152.3.52.135/test1'
 
@@ -17,7 +17,6 @@ app.config['TEMPLATES_AUTO_RELOAD'] = True
 app.config['SQLALCHEMY_DATABASE_URI'] = SQLALCHEMY_DATABASE_URI
 app.config['SECRET_KEY'] = os.urandom(24)
 db = SQLAlchemy(app)
-User = {'id': 1, 'is_seller': 0}  # dummy user who is placeholder until we make login
 
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -93,7 +92,25 @@ def forgot_password(user):
             return render_template('forgot_password.html', form=form, password=password, question=question)
     return render_template('forgot_password.html', form=form, password=password,  question=question)
 
-
+@app.route("/create_profile", methods=['GET', 'POST'])
+def create_profile():
+    form = CreateProfileForm()
+    if form.validate_on_submit():
+        existing_user = db.session.query(relations.User).filter_by(email=form.email.data).first()
+        if existing_user is None:
+            user_id = len(db.session.query(relations.User).all()) + 1
+            if form.is_seller.data == 'Yes':
+                seller = 1
+            elif form.is_seller.data == 'No':
+                seller = 0
+            new_user = relations.User(id=user_id, is_seller=seller, email=form.email.data,
+                                      password=form.password.data, question=form.question.data,
+                                      answer=form.answer.data, address=form.address.data)
+            db.session.add(new_user)
+            db.session.commit()
+            return redirect(url_for('main'))
+        #TODO: show message that user already exists under this email
+    return render_template('create_profile.html', form=form)
 
 """Functions for the items"""
 
