@@ -1,0 +1,36 @@
+{% extends "header.html" %}
+{% block title %}Order History{% endblock %}
+{% block content %}
+    <h1 class="text-center">Order History</h1>
+    <div class="container">
+    <div class="jumbotron">
+    <div class="row">
+        <div class="col"><h4>Order ID</h4></div>
+        <br>
+        <div class="col"><h4>Time Stamp</h4></div>
+        <br>
+        <div class="col"><h4>Price</h4></div>
+        <br>
+        <div class="col"><h4>Order Info</h4></div>
+    </div>
+        <hr/>
+    {% for order in orders %}
+
+            <div class="row">
+                <div class="col">{{ order.order_id }}</div>
+                <br>
+                <div class="col">{{ order.time_stamp }}</div>
+                <br>
+                <div class="col">{{ order.total_price }}</div>
+                <div class="col">
+                    <a href="{{ url_for('order_info', order_id=order.order_id) }}">
+                        <button class="btn btn-secondary btn-sm"> Order Info</button>
+                    </a>
+                </div>
+            </div>
+            <hr/>
+
+    {% endfor %}
+    </div>
+    </div>
+{% endblock %}

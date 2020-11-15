@@ -3,12 +3,13 @@ from flask import Flask, render_template, redirect, url_for, jsonify, request, f
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, login_user, current_user, login_required
 import os
+from sqlalchemy import or_
 import pymysql
 from werkzeug.datastructures import MultiDict
 
 import relations
-from forms import AddItemForm, EditProfileForm, EditItemForm, WriteReviewForm, LoginForm, ForgotPasswordForm, \
-    VerifyEmailForm, CreateProfileForm
+from forms import AddItemForm, EditProfileForm, EditItemForm, WriteReviewForm, LoginForm, ForgotPasswordForm, VerifyEmailForm, CreateProfileForm,SearchItemsForm
+
 
 SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://test:password@152.3.52.135/test1'
 
@@ -24,18 +25,25 @@ login_manager.init_app(app)
 """Functions for the main page"""
 
 
-@app.route('/')
+@app.route('/', methods=["GET", "POST"])
 def main():
     result = list()
-    query = db.session.query(relations.Item.sku, relations.Item.title, relations.Item.category, relations.Item.price,
-                             relations.Item.rating, relations.Item.seller, relations.Item.image).all()
+    form = SearchItemsForm()
+    search_string = form.item.data
+    if search_string is None:
+        query = db.session.query(relations.Item.sku, relations.Item.title, relations.Item.category, relations.Item.price,
+                                 relations.Item.rating, relations.Item.seller, relations.Item.image).all()
+    else:
+        query = db.session.query(relations.Item).filter(or_(relations.Item.title.like(f'%{search_string}%'),
+                                                            relations.Item.seller.like(f'%{search_string}%'),
+                                                            relations.Item.category.like(f'%{search_string}%')))
 
     for row in query:
         temp = {'sku': row.sku, 'title': row.title, 'category': row.category, 'price': row.price,
                 'rating': row.rating, 'seller': row.seller, 'image': row.image}
         result.append(temp)
 
-    return render_template('index.html', items=result)
+    return render_template('index.html', items=result, form=form)
 
 
 @login_manager.user_loader
@@ -314,7 +322,6 @@ def get_cart_info():
 @app.route('/placeorder', methods=["GET", "POST"])
 @login_required
 def place_order():
-    invalid_items = list()
     buyer_id = current_user.id
     cart_result, total_cost = get_cart_info()
     address = get_address()
@@ -358,6 +365,8 @@ def place_order():
     db.session.commit()
     new_payment = relations.RequiresPayment(order_id=new_order.order_id,
                                             credit_card_number=credit_card_query.credit_card)
+    db.session.add(new_payment)
+    db.session.commit()
     return redirect(url_for('main'))
 
 
@@ -423,6 +432,44 @@ def change_password():
     user.password = in_dict["password"]
     db.session.commit()
     return "Password successfully updated."
+
+
+@app.route("/profile/history", methods=["GET", "POST"])
+def order_history():
+    order_result = list()
+    user_id = current_user.id
+    history_query = db.session.query(relations.Order.order_id, relations.Order.time_stamp,
+                                     relations.Order.total_price).filter(relations.Order.buyer_id == user_id)
+    for row in history_query:
+        order = {'order_id': row.order_id, 'time_stamp': row.time_stamp,
+                 'total_price': row.total_price}
+        order_result.append(order)
+    return render_template('orderhistory.html', orders=order_result)
+
+
+@app.route("/profile/history/<order_id>", methods=["GET", "POST"])
+def order_info(order_id):
+    order_query = db.session.query(relations.OrdersContain.sku,
+                                   relations.OrdersContain.price_at_order,
+                                   relations.OrdersContain.quantity_ordered).filter(
+        relations.OrdersContain.order_id == order_id)
+    info_query = db.session.query(relations.Order.time_stamp,
+                                  relations.Order.total_price).filter(relations.Order.order_id == order_id)
+    info_query = info_query[0]
+    info_dict = {'order_id': order_id, 'time_stamp': info_query.time_stamp, 'total_price': info_query.total_price}
+    item_list = list()
+    for row in order_query:
+        item_query = db.session.query(relations.Item.sku, relations.Item.title, relations.Item.category,
+                                      relations.Item.price,
+                                      relations.Item.rating, relations.Item.description, relations.Item.seller,
+                                      relations.Item.image,
+                                      relations.Item.quantity).filter(relations.Item.sku == row.sku)
+        query = item_query[0]
+        item = {'sku': query.sku, 'title': query.title, 'category': query.category, 'price': row.price_at_order,
+                'rating': query.rating, 'description': query.description, 'seller': query.seller,
+                'image': query.image, 'quantity': row.quantity_ordered}
+        item_list.append(item)
+    return render_template('orderinfo.html', orders=item_list, info=info_dict)
 
 
 if __name__ == '__main__':
