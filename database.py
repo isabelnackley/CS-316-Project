@@ -43,7 +43,13 @@ def main():
                 'rating': row.rating, 'seller': row.seller, 'image': row.image}
         result.append(temp)
 
-    return render_template('index.html', items=result, form=form)
+    cat_list = list()
+    categories = db.session.query(relations.Item.category).distinct()
+    for row in categories:
+        temp = {'name': row.category}
+        cat_list.append(temp)
+
+    return render_template('index.html', items=result, form=form, categories=cat_list)
 
 
 @login_manager.user_loader
@@ -100,6 +106,27 @@ def forgot_password(user):
             return render_template('forgot_password.html', form=form, password=password, question=question)
     return render_template('forgot_password.html', form=form, password=password,  question=question)
 
+
+
+@app.route("/category/<name>", methods=["GET", "POST"])
+def category_page(name):
+    items_list = list()
+    items_query = db.session.query(relations.Item.sku, relations.Item.title, relations.Item.price,
+                                   relations.Item.rating, relations.Item.seller,
+                                   relations.Item.image).filter(relations.Item.category == name)
+    for row in items_query:
+        temp = {'sku': row.sku, 'title': row.title, 'price': row.price,
+                'rating': row.rating, 'seller': row.seller, 'image': row.image}
+        items_list.append(temp)
+    name_dict = {'name': name}
+    cat_list = list()
+    categories = db.session.query(relations.Item.category).distinct()
+    for row in categories:
+        temp = {'name': row.category}
+        cat_list.append(temp)
+    return render_template('category.html', items=items_list, name=name_dict, categories=cat_list)
+
+  
 @app.route("/create_profile", methods=['GET', 'POST'])
 def create_profile():
     form = CreateProfileForm()
@@ -119,6 +146,7 @@ def create_profile():
             return redirect(url_for('main'))
         #TODO: show message that user already exists under this email
     return render_template('create_profile.html', form=form)
+
 
 """Functions for the items"""
 
@@ -145,7 +173,12 @@ def item_page(sku):
     item = {'sku': query.sku, 'title': query.title, 'category': query.category, 'price': query.price,
             'rating': query.rating, 'description': query.description, 'seller': query.seller,
             'image': query.image, 'quantity': query.quantity}
-    return render_template('item.html', items=item)
+    cat_list = list()
+    categories = db.session.query(relations.Item.category).distinct()
+    for row in categories:
+        temp = {'name': row.category}
+        cat_list.append(temp)
+    return render_template('item.html', items=item, categories=cat_list)
 
 
 @app.route("/addItem", methods=['GET', 'POST'])
@@ -196,16 +229,6 @@ def modify_item(sku):
     return render_template('edit_item.html', item=item, form=form)
 
 
-@app.route("/displayCategories")
-def display_categories():
-    result = list()
-    categories = db.session.query(relations.Category.name)
-    for row in categories:
-        temp = {'category': row.category}
-        result.append(temp)
-    return jsonify(result)
-
-
 """Functions for search results"""
 
 
@@ -242,7 +265,12 @@ def cart_page():
                 'seller': item_query.seller, 'image': item_query.image}
         total_cost = total_cost + item_query.price
         result.append(item)
-    return render_template('cart.html', items=result, user=buyer_id, cost=round(total_cost, 2))
+        cat_list = list()
+        categories = db.session.query(relations.Item.category).distinct()
+        for r in categories:
+            temp = {'name': r.category}
+            cat_list.append(temp)
+    return render_template('cart.html', items=result, user=buyer_id, cost=round(total_cost, 2), categories=cat_list)
 
 
 @app.route("/addToCart", methods=["GET", "POST"])
