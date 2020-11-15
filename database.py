@@ -297,11 +297,11 @@ def cart_page():
                 'seller': item_query.seller, 'image': item_query.image}
         total_cost = total_cost + item_query.price
         result.append(item)
-        cat_list = list()
-        categories = db.session.query(relations.Item.category).distinct()
-        for r in categories:
-            temp = {'name': r.category}
-            cat_list.append(temp)
+    cat_list = list()
+    categories = db.session.query(relations.Item.category).distinct()
+    for r in categories:
+        temp = {'name': r.category}
+        cat_list.append(temp)
     return render_template('cart.html', items=result, user=buyer_id, cost=round(total_cost, 2), categories=cat_list)
 
 
