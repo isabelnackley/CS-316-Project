@@ -16,8 +16,6 @@
     <div class="text-center"> <h5>{{item.title}}</h5></div><br>
     <img src="{{ item.image }}" class="img-rounded" width="300"><br>
     <div class="text-center"> Price: {{item.price}}</div>
-    <!--div> Seller: {{item.seller}}</div>
-    <div> Rating: {{item.rating}}</div><br><br>-->
     <div class="row">
         <div class="col text-center">
             <a href="{{ url_for('item_page', sku=item.sku) }}">

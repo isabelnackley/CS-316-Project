@@ -44,7 +44,13 @@ def main():
                 'rating': row.rating, 'seller': row.seller, 'image': row.image}
         result.append(temp)
 
-    return render_template('index.html', items=result, form=form)
+    cat_list = list()
+    categories = db.session.query(relations.Item.category).distinct()
+    for row in categories:
+        temp = {'name': row.category}
+        cat_list.append(temp)
+
+    return render_template('index.html', items=result, form=form, categories=cat_list)
 
 
 @login_manager.user_loader
@@ -177,16 +183,6 @@ def modify_item(sku):
         print("Edit Item Form Validated")
         db.session.commit()
     return render_template('edit_item.html', item=item, form=form)
-
-
-@app.route("/displayCategories")
-def display_categories():
-    result = list()
-    categories = db.session.query(relations.Category.name)
-    for row in categories:
-        temp = {'category': row.category}
-        result.append(temp)
-    return jsonify(result)
 
 
 """Functions for search results"""

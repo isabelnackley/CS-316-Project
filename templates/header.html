@@ -52,9 +52,16 @@
             <li class="nav-item">
             <a class="nav-link" href="{{ url_for('login') }}">Log In</a>
           </li>
-            <li class="nav-item">
-            <a class="nav-link" href="{{ url_for('display_categories') }}">Categories</a>
-          </li>
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Categories
+                </a>
+                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                {% for name in categories %}
+                    <a class="dropdown-item">{{ name.name }}</a>
+                {% endfor %}
+                </div>
+            </li>
         </ul>
       </div>
 </nav>
