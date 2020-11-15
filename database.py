@@ -3,6 +3,7 @@ from flask import Flask, render_template, redirect, url_for, jsonify, request, f
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, login_user, current_user, login_required
 import os
+from sqlalchemy import or_
 import pymysql
 from werkzeug.datastructures import MultiDict
 
@@ -34,7 +35,9 @@ def main():
         query = db.session.query(relations.Item.sku, relations.Item.title, relations.Item.category, relations.Item.price,
                                  relations.Item.rating, relations.Item.seller, relations.Item.image).all()
     else:
-        query = db.session.query(relations.Item).filter(relations.Item.title.like(f'%{search_string}%'))
+        query = db.session.query(relations.Item).filter(or_(relations.Item.title.like(f'%{search_string}%'),
+                                                            relations.Item.seller.like(f'%{search_string}%'),
+                                                            relations.Item.category.like(f'%{search_string}%')))
 
     for row in query:
         temp = {'sku': row.sku, 'title': row.title, 'category': row.category, 'price': row.price,
