@@ -3,12 +3,11 @@
 
     <div class="container">
         <div class="jumbotron">
-            <h1 class="text-center">Items</h1>
+            <h1 class="text-center">Payment Methods</h1>
             <p class="text-center">Type In Payment Information to Save a Credit Card! <br>
             </p>
             <form action="" method="post" style="text-align:center" novalidate> {{ form.csrf_token }}
                 <div><h4>{{ form.credit_card.label }}</h4><br>{{ form.credit_card }}</div>
-                <div><h4>{{ form.address.label }}</h4><br>{{ form.address }}</div>
                 <div>{{ form.submit() }}</div>
             </form>
         </div>
@@ -18,7 +17,6 @@
             <h2 class="text-center">Saved Payment Methods</h2>
             {% for payment in payment_info %}
                <br> <div> Credit Card Number: {{payment.credit_card}} </div>
-                <div> Billing Address: {{payment.address}}</div> </br>
             {% endfor %}
         </div>
     </div>

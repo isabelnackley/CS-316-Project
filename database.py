@@ -445,16 +445,17 @@ def profile_page():
         return render_template('seller_profile.html', user=user)
 
 @app.route("/paymentmethod", methods=["POST", "GET"])
+@login_required
 def payment_method():
-    payment_info = db.session.query(relations.Payment).join(relations.PaysWith).filter(relations.PaysWith.buyer_id==current_user.id).all()
+    payment_info = db.session.query(relations.PaysWith).filter(relations.PaysWith.buyer_id==current_user.id).all()
     form = AddPaymentMethodForm()
     if form.validate_on_submit():
-        existing_card = db.session.query(relations.Payment).filter(relations.Payment.credit_card==form.credit_card.data).first()
+        existing_card = db.session.query(relations.PaysWith).filter(relations.PaysWith.credit_card==form.credit_card.data).first()
         print(existing_card)
         if existing_card == None:
-            new_payment = relations.Payment(credit_card=form.credit_card.data, address=form.address.data)
+            #new_payment = relations.Payment(credit_card=form.credit_card.data, address=form.address.data)
             link_to_buyer = relations.PaysWith(credit_card=form.credit_card.data, buyer_id=current_user.id)
-            db.session.add(new_payment)
+            #db.session.add(new_payment)
             db.session.add(link_to_buyer)
             db.session.commit()
             flash("New Payment Method Added")
@@ -553,4 +554,3 @@ def order_info(order_id):
 
 if __name__ == '__main__':
     app.run()
-    # print(db.session.query(relations.User.id, relations.User.is_buyer).all())

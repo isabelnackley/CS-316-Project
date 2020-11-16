@@ -73,5 +73,4 @@ class SearchItemsForm(FlaskForm):
 
 class AddPaymentMethodForm(FlaskForm):
     credit_card = IntegerField('Credit Card Number', [DataRequired()])
-    address = StringField('Billing Address', [DataRequired()])
     submit = SubmitField('Submit')

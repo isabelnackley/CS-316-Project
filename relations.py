@@ -137,8 +137,8 @@ class Payment(db.Model):
 
 class PaysWith(db.Model):
     __tablename__ = 'PaysWith'
-    credit_card = db.Column('credit_card', db.Integer(), ForeignKey('Payment.credit_card'), primary_key=True)
-    buyer_id = db.Column('buyer_id', db.Integer(), ForeignKey('Buyers.id'))
+    credit_card = db.Column('credit_card', db.Integer(), primary_key=True)
+    buyer_id = db.Column('buyer_id', db.Integer(), ForeignKey('Users.id'))
 
     def __init__(self, credit_card=None, buyer_id=None):
         self.credit_card = credit_card
