@@ -11,19 +11,21 @@
             <div> Answer: {{user.answer}}</div>
         </div>
     </div>
+    <div class="row">
     <div class="col text-right">
         <a href="{{ url_for('edit_profile', user_id= user.id) }}">
-            <button class="btn btn-secondary btn-lg"> Edit Profile</button>
+            <button class="btn btn-secondary btn-sm"> Edit Profile</button>
         </a>
     </div>
     <div class="col text-center">
         <a href="{{ url_for('order_history') }}">
-            <button class="btn btn-secondary btn-lg"> Order History</button>
+            <button class="btn btn-secondary btn-sm"> Order History</button>
         </a>
     </div>
     <div class="col">
         <a href="{{ url_for('payment_method') }}">
-            <button class="btn btn-secondary btn-lg"> Add a Payment Method</button>
+            <button class="btn btn-secondary btn-sm"> Add a Payment Method</button>
         </a>
+    </div>
     </div>
 {% endblock %}
