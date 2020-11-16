@@ -3,7 +3,7 @@ from flask import Flask, render_template, redirect, url_for, jsonify, request, f
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, login_user, current_user, login_required, logout_user
 import os
-from sqlalchemy import or_, func
+from sqlalchemy import or_, func, and_
 import pymysql
 from werkzeug.datastructures import MultiDict
 
@@ -172,19 +172,21 @@ def create_profile():
 @app.route('/item/<sku>/review', methods=["GET", "POST"])
 @login_required
 def review(sku):
-    item = db.session.query(relations.Item).filter(relations.Item.sku == sku).first()
+    item = db.session.query(relations.Item).filter_by(sku = sku).first()
     title = {'title': item.title}
     form = WriteReviewForm()
     if form.validate_on_submit():
-        existing_review = db.session.query(relations.Review).filter(relations.Review.sku==sku and relations.Review.buyer_id==current_user.id)
+        existing_review = db.session.query(relations.Review).filter(and_(relations.Review.sku==sku, relations.Review.buyer_id==current_user.id)).first()
         if existing_review == None:
             new_review = relations.Review(seller_id=item.seller, buyer_id=current_user.id, sku=sku, item_rating=form.star_rating.data, seller_rating=0,
                                           written_review=form.written_rating.data)
 
             db.session.add(new_review)
             item_rating = db.session.query(func.avg(relations.Review.item_rating).label('average')).filter_by(sku=sku).scalar()
-            seller_rating = db.session.query(func.avg(relations.Review.item_rating)).filter_by(seller_id=item.seller).all()
+            seller_rating = db.session.query(func.avg(relations.Review.item_rating)).filter_by(seller_id=item.seller).scalar()
             db.session.query(relations.Item).filter_by(sku=sku).update({relations.Item.rating: item_rating})
+            print(item.seller)
+            print(seller_rating)
             db.session.query(relations.Seller).filter_by(id=item.seller).update({relations.Seller.rating: seller_rating})
             db.session.commit()
             return redirect(url_for('item_page', sku=sku))

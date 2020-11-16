@@ -88,7 +88,7 @@ class Item(db.Model):
 class Review(db.Model):
     __tablename__ = 'Reviews'
     seller_id = db.Column('seller_id', db.Integer(), ForeignKey('Sellers.id'), primary_key=True)
-    buyer_id = db.Column('buyer_id', db.Integer(), ForeignKey('Buyers.id'), primary_key=True)
+    buyer_id = db.Column('buyer_id', db.Integer(), ForeignKey('Users.id'), primary_key=True)
     sku = db.Column('SKU', db.Integer(), ForeignKey('Items.SKU'), primary_key=True)
     seller_rating = db.Column('seller_rating', db.Integer())
     item_rating = db.Column('item_rating', db.Integer())
@@ -209,7 +209,7 @@ class OrdersContain(db.Model):
 class Places(db.Model):
     __tablename__ = 'Places'
     order_id = db.Column('order_id', db.Integer(), ForeignKey('Orders.order_id'), primary_key=True)
-    buyer_id = db.Column('buyer_id', db.Integer(), ForeignKey('Buyers.id'))
+    buyer_id = db.Column('buyer_id', db.Integer(), ForeignKey('Users.id'))
 
     def __init__(self, order_id=None, buyer_id=None):
         self.order_id = order_id
