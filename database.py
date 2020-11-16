@@ -419,10 +419,6 @@ def place_order():
                                          quantity_ordered=item["quantity"], price_at_order=item["price"])
         db.session.add(new_oc)
         db.session.commit()
-    # Add to places
-    new_places = relations.Places(order_id=new_order.order_id, buyer_id=buyer_id)
-    db.session.add(new_places)
-    db.session.commit()
     new_payment = relations.RequiresPayment(order_id=new_order.order_id,
                                             credit_card_number=credit_card_query.credit_card)
     db.session.add(new_payment)

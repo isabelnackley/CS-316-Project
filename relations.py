@@ -36,17 +36,6 @@ class User(UserMixin, db.Model):
         return '<User %r>' % self.model
 
 
-class Buyer(db.Model):
-    __tablename__ = 'Buyers'
-    id = db.Column('id', db.Integer(), ForeignKey('Users.id'), primary_key=True)
-
-    def __init__(self, id=None):
-        self.id = id
-
-    def __repr__(self):
-        return '<Buyer %r' % self.model
-
-
 class Seller(db.Model):
     __tablename__ = 'Sellers'
     id = db.Column('id', db.Integer(), ForeignKey('Users.id'), primary_key=True)
