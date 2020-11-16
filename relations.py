@@ -55,7 +55,7 @@ class Item(db.Model):
     title = db.Column('title', db.String(256))
     description = db.Column('description', db.String(256))
     category = db.Column('category', db.String(256))
-    quantity = db.column('quantity', db.Integer())
+    quantity = db.Column('quantity', db.Integer())
     price = db.Column('price', db.Float())
     rating = db.Column('rating', db.Float())
     seller = db.Column('seller', db.Integer(), ForeignKey('Sellers.id'))

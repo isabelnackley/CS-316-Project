@@ -219,11 +219,15 @@ def add_item():
     form = AddItemForm()
     sku = len(db.session.query(relations.Item).all()) + 1
     if form.validate_on_submit():
+        print(form.quantity.data)
         new_item = relations.Item(sku=sku, title=form.title.data, description=form.description.data,
                                   price=form.price.data, category=form.category.data, quantity=form.quantity.data,
-                                  rating=None, seller=current_user.id, image=form.image.data)
+                                  rating=0, seller=current_user.id, image=form.image.data)
         db.session.add(new_item)
+
         db.session.commit()
+        x = db.session.query(relations.Item.quantity).filter_by(sku=sku).first()
+        print(x)
         flash('Item added to inventory.')
         return redirect(url_for('main'))
     return render_template('additem.html', form=form)
@@ -241,7 +245,6 @@ def remove_item():
 @app.route("/<sku>/modifyItem", methods=["GET", "POST"])
 @login_required
 def modify_item(sku):
-    # TODO: validate that item sku is being sold by seller
     query = db.session.query(relations.Item.title,
                              relations.Item.description, relations.Item.category, relations.Item.quantity,
                              relations.Item.price, relations.Item.image).filter(relations.Item.sku == sku).first()
@@ -253,13 +256,20 @@ def modify_item(sku):
             {'title': query.title, 'description': query.description, 'category': query.category,
              'quantity': query.quantity,
              'price': query.price, 'image': query.image}))
-        form.category.choices = [x.name for x in db.session.query(relations.Category.name).all()]
+        form.category.choices = [x.category for x in db.session.query(relations.Item.category).distinct()]
     elif request.method == 'POST':
+        print('yes')
         form = EditItemForm()
-        if form.validate_on_submit():
-            relations.Item.updateItem(form.title.data, form.description.data, form.category.data, form.quantity.data,
-                                      form.price.data, form.image.data, sku)
-            db.session.commit()
+        #if form.validate_on_submit():
+        modify_item_query = db.session.query(relations.Item).filter_by(sku=sku).first()
+        relations.Item.updateItem(form.title.data,
+                                   form.description.data,
+                                   form.category.data,
+                                   form.quantity.data,
+                                   form.price.data,
+                                   form.image.data, sku)
+        db.session.commit()
+        return redirect(url_for('seller_page'))
     return render_template('edit_item.html', item=item, form=form)
 
 
@@ -490,18 +500,19 @@ def edit_profile(user_id):
     return render_template('edit_profile.html', user=user, form=form)
 
 
-@app.route("/<user_id>/sellerpage", methods=["GET"])
-def seller_page(user_id):
+@app.route("/sellerpage", methods=["GET"])
+
+def seller_page():
     result = list()
     query = db.session.query(relations.Item.sku, relations.Item.title, relations.Item.category, relations.Item.price,
                              relations.Item.rating, relations.Item.seller, relations.Item.image).filter(
-        relations.Item.seller == user_id)
+        relations.Item.seller == current_user.id)
     for row in query:
         temp = {'sku': row.sku, 'title': row.title, 'category': row.category, 'price': row.price,
                 'rating': row.rating, 'seller': row.seller, 'image': row.image}
         result.append(temp)
 
-    seller_rating = db.session.query(relations.Seller.rating).filter(relations.Seller.id == user_id).scalar()
+    seller_rating = db.session.query(relations.Seller.rating).filter(relations.Seller.id == current_user.id).scalar()
 
     return render_template('seller_page.html', items=result, rating=seller_rating)
 
