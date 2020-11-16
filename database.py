@@ -453,7 +453,6 @@ def payment_method():
     form = AddPaymentMethodForm()
     if form.validate_on_submit():
         existing_card = db.session.query(relations.PaysWith).filter(relations.PaysWith.credit_card==form.credit_card.data).first()
-        print(existing_card)
         if existing_card == None:
             #new_payment = relations.Payment(credit_card=form.credit_card.data, address=form.address.data)
             link_to_buyer = relations.PaysWith(credit_card=form.credit_card.data, buyer_id=current_user.id)
